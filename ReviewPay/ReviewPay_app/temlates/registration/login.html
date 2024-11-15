@@ -1,0 +1,27 @@
+{% extends "admin/login.html" %}
+
+{% block content %}
+<div class="custom-login">
+    <h2>Custom Login Page</h2>
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+</div>
+<style>
+    .custom-login {
+        text-align: center;
+        margin-top: 50px;
+    }
+    .custom-login h2 {
+        color: #007bff;
+    }
+    .custom-login button {
+        background-color: #73ff00;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+    }
+</style>
+{% endblock %}

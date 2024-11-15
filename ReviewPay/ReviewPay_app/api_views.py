@@ -18,37 +18,63 @@ User = get_user_model()  # Get the custom user model
 @csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
 def api_signup(request):
     if request.method == 'POST':
-        
         data = request.POST
-        username = data.get('username')
+        
+        name = data.get('username')
         email = data.get('email')
         password = data.get('password')
         confirm_password = data.get('confirm_password')
+        role = data.get('role')
+        
+        if bool(name) == False or bool(email)== False or bool(password) == False :
+            return JsonResponse({'error': 'username,email and password is required'}, status=400)
 
         if password != confirm_password:
             return JsonResponse({'error': 'Passwords do not match'}, status=400)
 
-        if username and email and password :
-            try:
-                user = User.objects.create_user(username=username, email=email, password=password)
-                user.save()
-                return JsonResponse({'message': 'User is successfully register.'}, status=201)
-            except Exception as e:
-                return JsonResponse({'error': "this username already exists"}, status=400)
-        
+        # Check if the role is "business"
+        if role == 'business':
+            category = data.get('category')
+            sub_category = data.get('sub_category')
+            abn_number = data.get('abn_number')
+            business_name = data.get('business_name')
+            business_address = data.get('business_address')
+        elif role == 'custom':
+            # If role is "custom", ensure these fields are cleared
+            category = ''
+            sub_category = ''
+            abn_number = ''
+            business_name = ''
+            business_address = ''
         else:
-            return JsonResponse({'error': 'Enter all fields again.'}, status=400)
+            return JsonResponse({'error': 'Invalid role User'}, status=400)
+        profile_picture = None
+        if request.FILES.get('profile_picture'):
+            profile_picture = request.FILES.get('profile_picture')
 
-    
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+        # Save the user instance
 
+        try:
+            user = User.objects.create_user(username=email,name=name ,email=email, password=password,role=role,category=category,sub_category=sub_category,abn_number=abn_number,business_name=business_name,business_address=business_address,profile_picture=profile_picture)
+            if role == 'business':
+                user.save()
+                return JsonResponse({'message': 'Business User add Successfully'}, status=201)
+            elif role == 'custom':
+                user.save()
+                return JsonResponse({'message': 'Custom User add Successfully'}, status=201)
+        
+        except:
+            return JsonResponse({'error': 'User is already register'}, status=400)
+    else:
+        return JsonResponse({'error': 'Enter all fields again.'}, status=400)
+#------------------------------------
 
 @csrf_exempt
 def api_login(request):
-    
+   
     if request.method == 'POST':
         data = request.POST
-        username = data.get('username')
+        username = data.get('email')
         password = data.get('password')
 
         # Authenticate the user
@@ -62,7 +88,7 @@ def api_login(request):
             access_token = str(refresh.access_token)
 
             return JsonResponse({
-                'message': 'Login successful!',
+                'message': 'Login successfull!',
                 'access_token': access_token,
                 'refresh_token': str(refresh)
             }, status=200)
