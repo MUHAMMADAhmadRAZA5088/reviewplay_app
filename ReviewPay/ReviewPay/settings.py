@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-&69+3d3g1#v_3nyxadbggf$_4dl119$01+nybnzp33y(spbe23
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','192.168.100.14','142.93.246.188']
+ALLOWED_HOSTS = ['*','192.168.100.14','142.93.246.188','13.236.178.111']
 
 
 AUTH_USER_MODEL = 'ReviewPay_app.CategoryUsers'  
