@@ -64,7 +64,7 @@ ROOT_URLCONF = 'ReviewPay.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'bulid')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -208,6 +208,10 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [
+    # BASE_DIR / 'build' / 'static',  # React app ka static folder
+    BASE_DIR / 'ReviewPay_app' / 'static',            # Django app ka static folder
+]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
