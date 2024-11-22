@@ -43,12 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ReviewPay_app',
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,6 +62,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'ReviewPay.urls'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React app ka URL
+    "http://reviewpay.com.au"
+]
 
 TEMPLATES = [
     {
@@ -141,7 +148,7 @@ JAZZMIN_SETTINGS = {
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
   
     # Whether to show the UI customizer on the sidebar
-    "show_ui_builder": True,
+    "show_ui_builder": False,
 
 
 }
