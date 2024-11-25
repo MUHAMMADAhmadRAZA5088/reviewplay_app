@@ -69,7 +69,6 @@ def businessImages(user, businessImages):
 @csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
 def api_signup(request):
     if request.method == 'POST':
-        import pdb;pdb.set_trace()
         user_data = json.loads(request.body)
         data = user_data['createAccount']
      
