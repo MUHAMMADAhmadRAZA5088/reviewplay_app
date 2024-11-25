@@ -69,6 +69,7 @@ def businessImages(user, businessImages):
 @csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
 def api_signup(request):
     if request.method == 'POST':
+        import pdb;pdb.set_trace()
         user_data = json.loads(request.body)
         data = user_data['createAccount']
      
@@ -149,9 +150,10 @@ def api_login(request):
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
-
+        
             return JsonResponse({
                 'message': 'Login successfull!',
+                'Role' : user.role,
                 'access_token': access_token,
                 'refresh_token': str(refresh)
             }, status=200)
