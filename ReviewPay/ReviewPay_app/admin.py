@@ -41,7 +41,7 @@ class BusinessdetailAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
-admin.site.register(Businessdetail, BusinessdetailAdmin)
+
 
 # # Inline Employee Admin
 # class EmployeeInline(admin.TabularInline):

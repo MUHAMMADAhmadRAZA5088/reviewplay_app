@@ -50,11 +50,11 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -64,13 +64,11 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'ReviewPay.urls'
 
 CORS_ALLOWED_ORIGINS = [
-    'http://192.168.100.14:8000/',
-    "http://localhost:3000",  # React app ka URL
-    "https://reviewpay.com.au/"
+    "http://192.168.100.14",
+    "https://reviewpay.com.au",
     "https://superadmin.reviewpay.com.au"
-    # "http://superadmin.reviewpay.com.au"
-    # "https://superadmin.reviewpay.com.au"
 ]
+
 
 TEMPLATES = [
     {
