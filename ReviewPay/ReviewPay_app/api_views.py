@@ -22,7 +22,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
-from .models import CategoryUsers, Businessdetail
+from .models import CategoryUsers, Businessdetail, Employee, Product
 # from .models import CategoryUsers, Employee, Product, UploadedImages
 
 User = get_user_model()  # Get the custom user model
@@ -212,4 +212,54 @@ def create_or_update_business_detail(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def employee_detail(request):
-    pass
+    user = request.user
+    try:
+        # Parse the incoming JSON data
+        employee_data = json.loads(request.body)
+        # Check if required data is present
+        if not employee_data:
+            return JsonResponse({'error': 'Invalid data.'}, status=400)
+        
+        employee = Employee(business=user,
+                            employee_name = employee_data['employee_name'],
+                            identification_number = employee_data['identification_number'],
+                            designation = employee_data['designation'],
+                            employee_email_address = employee_data['employee_email_address'],
+                            employee_profiles = employee_data['employee_profiles']
+                            )
+
+        employee.save()
+        return JsonResponse({'message': 'Employee data added successfully.'}, status=200)
+    
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+        
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def product(request):
+    user = request.user
+    try:
+        # Parse the incoming JSON data
+        product_data = json.loads(request.body)
+        # Check if required data is present
+        if not product_data:
+            return JsonResponse({'error': 'Invalid data.'}, status=400)
+        
+        product = Product(  
+                            business=user,
+                            product_name = product_data['product_name'],
+                            product_description = product_data['product_description'],
+                            product_price = product_data['product_price'],
+                            product_images = product_data['product_images']
+                            )
+
+        product.save()
+        return JsonResponse({'message': 'Product data added successfully.'}, status=200)
+    
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+        

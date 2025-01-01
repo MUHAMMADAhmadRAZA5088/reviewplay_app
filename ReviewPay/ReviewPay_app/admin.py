@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse  # Import reverse
 from django.utils.html import format_html  # Import format_html
 from django.utils.html import mark_safe
-from .models import CategoryUsers,Businessdetail
+from .models import CategoryUsers, Businessdetail, Employee, Product
 
 from django.contrib import admin
 # from .models import CategoryUsers, Employee, Product, UploadedImages
@@ -43,6 +43,35 @@ class BusinessdetailAdmin(admin.ModelAdmin):
         )
 
 
+# Register the Employee model with its own admin class
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('business', 'employee_name', 'identification_number', 'designation', 'employee_email_address','delete_option')
+
+        # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            delete_url
+        )
+
+# Register the Products model with its own admin class
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('business', 'product_name', 'product_description', 'product_price','delete_option')
+
+        # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            delete_url
+        )
+
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Employee,EmployeeAdmin)
+admin.site.register(Businessdetail, BusinessdetailAdmin)
+admin.site.register(CategoryUsers, CategoryUsersAdmin)
+
 # # Inline Employee Admin
 # class EmployeeInline(admin.TabularInline):
 #     model = Employee
@@ -63,12 +92,8 @@ class BusinessdetailAdmin(admin.ModelAdmin):
 #     inlines = [EmployeeInline, ProductInline, UploadedImagesInline]
 
 # # Register Models
-admin.site.register(Businessdetail, BusinessdetailAdmin)
-admin.site.register(CategoryUsers, CategoryUsersAdmin)
-# admin.site.register(Businessdetail)
-# admin.site.register(Employee)
-# admin.site.register(Product)
-# admin.site.register(UploadedImages)
+
+
 
 
 

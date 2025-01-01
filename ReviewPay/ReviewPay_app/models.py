@@ -41,19 +41,26 @@ class Employee(models.Model):
 
     class Meta:
         verbose_name = "Employee Detail"
-        verbose_name_plural = "Employees Details"  # Plural form
+        verbose_name_plural = "Employees Details"  # Plural Form
 
     def __str__(self):
         return self.business_name or "Unnamed Business"
 
         
-# # Product Model
-# class Product(models.Model):
-#     business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="products")
-#     product_name = models.CharField(max_length=255)
-#     product_description = models.TextField()
-#     product_price = models.CharField(max_length=255)
-#     product_images = models.ImageField(upload_to='product_images/', blank=True, null=True)
+# Product Model
+class Product(models.Model):
+    business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="products")
+    product_name = models.CharField(max_length=255)
+    product_description = models.TextField()
+    product_price = models.CharField(max_length=255)
+    product_images = models.ImageField(upload_to='product_images/', blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Products Details"
+        verbose_name_plural = "Products Details"  # Plural Form
+
+    def __str__(self):
+        return self.business_name or "Unnamed Business"
 
 # # UploadedImages Model
 # class UploadedImages(models.Model):
