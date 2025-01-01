@@ -63,12 +63,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'ReviewPay.urls'
 
-# CORS_ALLOWED_ORIGINS = [
-#     'http://192.168.100.14:8000/',
-#     "http://localhost:3000",  # React app ka URL
-#     "https://reviewpay.com.au"
-#     "https://admin.reviewpay.com.au"
-# ]
+CORS_ALLOWED_ORIGINS = [
+    'http://192.168.100.14:8000/',
+    "http://localhost:3000",  # React app ka URL
+    "https://reviewpay.com.au"
+    "https://superadmin.reviewpay.com.au"
+]
 
 TEMPLATES = [
     {
