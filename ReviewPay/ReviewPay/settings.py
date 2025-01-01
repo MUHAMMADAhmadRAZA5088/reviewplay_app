@@ -66,7 +66,8 @@ ROOT_URLCONF = 'ReviewPay.urls'
 CORS_ALLOWED_ORIGINS = [
     'http://192.168.100.14:8000/',
     "http://localhost:3000",  # React app ka URL
-    "https://reviewpay.com.au"
+    "https://reviewpay.com.au/"
+    ""
     # "http://superadmin.reviewpay.com.au"
     # "https://superadmin.reviewpay.com.au"
 ]
