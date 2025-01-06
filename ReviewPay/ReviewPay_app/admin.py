@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse  # Import reverse
 from django.utils.html import format_html  # Import format_html
 from django.utils.html import mark_safe
-from .models import CategoryUsers, Businessdetail, Employee, Product
+from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail
 
 from django.contrib import admin
 # from .models import CategoryUsers, Employee, Product, UploadedImages
@@ -45,7 +45,7 @@ class BusinessdetailAdmin(admin.ModelAdmin):
 
 # Register the Employee model with its own admin class
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('business', 'employee_name', 'identification_number', 'designation', 'employee_email_address','delete_option')
+    list_display = ('business', 'employee_name', 'identification_number', 'designation','working_since', 'employee_email_address','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):
@@ -67,31 +67,23 @@ class ProductAdmin(admin.ModelAdmin):
             delete_url
         )
 
+class UserDetailAdmin(admin.ModelAdmin):
+    list_display = ('business', 'first_name', 'last_name', 'gender','date_of_birth','profile_image','delete_option')
+
+        # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            delete_url
+        )
+
+admin.site.register(UserDetail, UserDetailAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Employee,EmployeeAdmin)
 admin.site.register(Businessdetail, BusinessdetailAdmin)
 admin.site.register(CategoryUsers, CategoryUsersAdmin)
 
-# # Inline Employee Admin
-# class EmployeeInline(admin.TabularInline):
-#     model = Employee
-#     extra = 1  # Number of empty forms to show
-
-# # Inline Product Admin
-# class ProductInline(admin.TabularInline):
-#     model = Product
-#     extra = 1
-
-# # Inline Uploaded Images Admin
-# class UploadedImagesInline(admin.TabularInline):
-#     model = UploadedImages
-#     extra = 1
-
-# Combine Everything in CategoryUsersAdmin
-# class CustomCategoryUsersAdmin(CategoryUsersAdmin):
-#     inlines = [EmployeeInline, ProductInline, UploadedImagesInline]
-
-# # Register Models
 
 
 

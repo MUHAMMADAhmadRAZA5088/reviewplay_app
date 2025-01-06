@@ -13,7 +13,7 @@ class CategoryUsers(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES,default="admin user")
 
 
-class Businessdetail(CategoryUsers):
+class Businessdetail(models.Model):
     business = models.OneToOneField(CategoryUsers, on_delete=models.CASCADE, related_name="businesses")
     businessLogo = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True)
@@ -37,14 +37,14 @@ class Employee(models.Model):
     identification_number = models.CharField(max_length=100)
     designation = models.CharField(max_length=100)
     employee_email_address = models.EmailField()
+    working_since  = models.CharField(max_length=100)
     employee_profiles = models.ImageField(upload_to='employee_profiles/', blank=True, null=True)
 
     class Meta:
         verbose_name = "Employee Detail"
         verbose_name_plural = "Employees Details"  # Plural Form
 
-    def __str__(self):
-        return self.business_name or "Unnamed Business"
+    
 
         
 # Product Model
@@ -61,6 +61,20 @@ class Product(models.Model):
 
     def __str__(self):
         return self.business_name or "Unnamed Business"
+
+class UserDetail(models.Model):
+    business = models.OneToOneField(CategoryUsers, on_delete=models.CASCADE, related_name="user")
+    first_name = models.CharField(max_length=255)
+    last_name = models.TextField()
+    gender = models.CharField(max_length=255)
+    date_of_birth  = models.DateField()
+    profile_image = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    class Meta:
+        verbose_name = "User Detail"
+        verbose_name_plural = "User Details"  # Plural Form
+
+    def __str__(self):
+        return self.first_name or "Unnamed Business"
 
 # # UploadedImages Model
 # class UploadedImages(models.Model):

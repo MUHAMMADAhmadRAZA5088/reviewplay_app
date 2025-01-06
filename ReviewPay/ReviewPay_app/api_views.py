@@ -22,8 +22,9 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
-from .models import CategoryUsers, Businessdetail, Employee, Product
-# from .models import CategoryUsers, Employee, Product, UploadedImages
+from datetime import datetime
+from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail
+
 
 User = get_user_model()  # Get the custom user model
 
@@ -33,35 +34,6 @@ def image_decode(image):
     ext = format.split('/')[-1]  # File ka extension (png/jpg)
     image = ContentFile(base64.b64decode(imgstr), name=f"{uuid.uuid4()}.{ext}")
     return image
-
-def employ(user, data_employee):
-    for employee_data in data_employee:
-        
-        business = user
-        employee_name = employee_data['employeeName']
-        identification_number = employee_data['identificationNumber']
-        designation = employee_data['designation']
-        employee_email_address = employee_data['employeeEmailAddress']
-        if employee_data['profilePic'] != '':
-            employee_profiles = image_decode(employee_data['profilePic'])
-        else:
-            employee_profiles = ''
-        Employee.objects.create(
-                business=business,
-                employee_name=employee_name,
-                identification_number=identification_number,
-                designation=designation,
-                employee_email_address=employee_email_address,
-                employee_profiles=employee_profiles
-            )
-
-def Product_Data(user, data_product):
-    for product_data in data_product:
-        if product_data['productImage'] != '':
-            product_image = image_decode(product_data['productImage'])
-        else:
-            product_image = ''
-        Product.objects.create(business = user,product_name = product_data['productName'],product_description = product_data['productDescription'],product_price = product_data['productPrice'],product_images = product_image)
 
 def businessImages(user, businessImages):
     for businessimages in businessImages:
@@ -187,7 +159,7 @@ def create_or_update_business_detail(request):
         business_detail, created = Businessdetail.objects.update_or_create(
             business=user,  # Check by the `business` field (OneToOne relation)
             defaults={
-                'businessLogo': business_data.get("businessLogo"),
+                'businessLogo': image_decode(business_data.get("businessLogo")),
                 'category': business_data.get("category"),
                 'sub_category': business_data.get("subCategory"),
                 'abn_number': business_data.get("abnNumber"),
@@ -220,12 +192,14 @@ def employee_detail(request):
         if not employee_data:
             return JsonResponse({'error': 'Invalid data.'}, status=400)
         
-        employee = Employee(business=user,
-                            employee_name = employee_data['employee_name'],
-                            identification_number = employee_data['identification_number'],
-                            designation = employee_data['designation'],
-                            employee_email_address = employee_data['employee_email_address'],
-                            employee_profiles = employee_data['employee_profiles']
+        employee = Employee(
+            business=user,
+            employee_name = employee_data['employee_name'],
+            identification_number = employee_data['identification_number'],
+            working_since = employee_data['working_since'],
+            designation = employee_data['designation'],
+            employee_email_address = employee_data['employee_email_address'],
+            employee_profiles = image_decode(employee_data['employee_profiles'])
                             )
 
         employee.save()
@@ -247,12 +221,13 @@ def product(request):
         if not product_data:
             return JsonResponse({'error': 'Invalid data.'}, status=400)
         
+        
         product = Product(  
                             business=user,
                             product_name = product_data['product_name'],
                             product_description = product_data['product_description'],
                             product_price = product_data['product_price'],
-                            product_images = product_data['product_images']
+                            product_images = image_decode(product_data['product_images'])
                             )
 
         product.save()
@@ -262,4 +237,44 @@ def product(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def user_detail(request):
+    user = request.user
+    if 'user' == request.user.role:
+
+        try:
+            # Parse the incoming JSON data
+            user_data = json.loads(request.body)
         
+            image = image_decode(user_data['profile_image'])
+            # Check if required data is present
+            if not user_data:
+                return JsonResponse({'error': 'Invalid data.'}, status=400)
+
+        
+            user_detail, created = UserDetail.objects.update_or_create(
+                                    business = user,
+                                    defaults = {
+                                     'first_name' : user_data['first_name'],
+                                     'last_name' : user_data['last_name'],
+                                     'gender' : user_data['gender'],
+                                     'date_of_birth' : datetime.strptime(user_data['date_of_birth'], '%d-%m-%Y').date(),
+                                     'profile_image' : image
+                                    }
+                                    )
+        
+            if created:
+                message = 'User Detail data added successfully.'
+            else:
+                message = 'User Detail data updated successfully.'
+
+            return JsonResponse({'message': message}, status=200)
+        
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+      return JsonResponse({'error': 'The role is not of a user.'}, status=400)  
