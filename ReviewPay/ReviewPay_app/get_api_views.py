@@ -90,26 +90,37 @@ def get_business_detail(request):
         
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_employee_detail(request):
-    # import pdb;pdb.set_trace()
+def get_employee_detail(request, slug=None):
     user = request.user
     data = []
-    try :
-        employee_detail = Employee.objects.filter(business=user)
+    try:
+        # Check if slug is provided
+        if slug:
+            # Fetch specific employee using slug
+            employee_detail = Employee.objects.filter(business=user, id=slug)  # Replace `id` with your slug field if it's different
+        else:
+            # Fetch all employees for the user
+            employee_detail = Employee.objects.filter(business=user)
+
+        if not employee_detail.exists():
+            return JsonResponse({'error': 'No employee found with the given ID or slug'}, status=404)
+
+        # Prepare data
         for employee in employee_detail:
             data.append({
                 'id': employee.id,
                 'employee_name': employee.employee_name,
-                'identification_number' : employee.identification_number,
-                'designation' : employee.designation,
-                'email' : employee.employee_email_address,
-                'working_since' : employee.working_since,
-                'employee_profiles' : 'http://127.0.0.1:8000/' + employee.employee_profiles.url,  # Check if profile_image exists
-                'user_email' : employee.business.email
-
+                'identification_number': employee.identification_number,
+                'designation': employee.designation,
+                'email': employee.employee_email_address,
+                'working_since': employee.working_since,
+                'employee_profiles': f'http://127.0.0.1:8000/{employee.employee_profiles.url}' if employee.employee_profiles else None,
+                'user_email': employee.business.email
             })
-            # Return the data as JSON
+
+        # Return data as JSON
         return JsonResponse(data, safe=False, status=200)
-    except:
-        return JsonResponse({'error':'data is not find'}, status=404)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
