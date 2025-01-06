@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import datetime
-from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail
+from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback
 
 
 User = get_user_model()  # Get the custom user model
@@ -124,3 +124,36 @@ def get_employee_detail(request, slug=None):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_feedback(request, slug=None):
+    user = request.user
+    data = []
+    try:
+        # Check if slug is provided
+        if slug:
+            # Fetch specific employee using slug
+            feedback = Feedback.objects.filter(business=user, id=slug)  # Replace `id` with your slug field if it's different
+        else:
+            # Fetch all employees for the user
+            feedback = Feedback.objects.filter(business=user)
+
+        if not feedback.exists():
+            return JsonResponse({'error': 'No employee found with the given ID or slug'}, status=404)
+        
+         # Prepare data
+        for item in feedback:
+            data.append({
+                'id': item.id,
+                'issue_category': item.issue_category,
+                'issue_description': item.issue_description,
+                'urgency_level': item.urgency_level,
+                'user_email': item.business.email
+            })
+
+        # Return data as JSON
+        return JsonResponse(data, safe=False, status=200)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

@@ -76,6 +76,15 @@ class UserDetail(models.Model):
     def __str__(self):
         return self.first_name or "Unnamed Business"
 
+class Feedback(models.Model):
+    business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="category")
+    issue_category = models.CharField(max_length=255)
+    issue_description = models.TextField()
+    urgency_level = models.CharField(max_length=255)
+    class Meta:
+        verbose_name = "Feedback"
+        verbose_name_plural = "Feedback"  # Plural Form
+
 # # UploadedImages Model
 # class UploadedImages(models.Model):
 #     business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="uploaded_images")

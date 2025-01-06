@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse  # Import reverse
 from django.utils.html import format_html  # Import format_html
 from django.utils.html import mark_safe
-from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail
+from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback
 
 from django.contrib import admin
 # from .models import CategoryUsers, Employee, Product, UploadedImages
@@ -78,6 +78,18 @@ class UserDetailAdmin(admin.ModelAdmin):
             delete_url
         )
 
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('id', 'business', 'issue_category', 'issue_description','urgency_level')
+
+        # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            delete_url
+        )
+
+admin.site.register(Feedback, FeedbackAdmin)
 admin.site.register(UserDetail, UserDetailAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Employee,EmployeeAdmin)

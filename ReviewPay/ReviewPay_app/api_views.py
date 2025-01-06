@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import datetime
-from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail
+from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback
 
 
 User = get_user_model()  # Get the custom user model
@@ -278,3 +278,21 @@ def user_detail(request):
             return JsonResponse({'error': str(e)}, status=500)
     else:
       return JsonResponse({'error': 'The role is not of a user.'}, status=400)  
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def feedback(request):
+    user = request.user
+    try:
+        data = json.loads(request.body)
+        feedback = Feedback.objects.create(business = user,
+                                           issue_category = data['issue_category'],
+                                           issue_description = data['feedback_description'],
+                                           urgency_level = data['urgency_level']
+                                           )
+        return JsonResponse({'message': 'feedback add successfully.'}, status=200)
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
