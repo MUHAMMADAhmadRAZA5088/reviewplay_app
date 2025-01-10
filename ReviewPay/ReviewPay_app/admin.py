@@ -69,12 +69,25 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ('product', 'image')
+    list_display = ('product', 'image', 'delete_option')
 
+    def delete_option(self, obj):
+
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            delete_url
+        )
 @admin.register(Barcode)
 class BarcodeAdmin(admin.ModelAdmin):
-    list_display = ('product', 'barcode_value')
+    list_display = ('product', 'barcode_value', 'delete_option')
 
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            delete_url
+        )
 class UserDetailAdmin(admin.ModelAdmin):
     list_display = ('business', 'first_name', 'last_name', 'gender','date_of_birth','profile_image','delete_option')
 

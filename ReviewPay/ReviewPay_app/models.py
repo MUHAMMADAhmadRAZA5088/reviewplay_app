@@ -56,28 +56,18 @@ class Product(models.Model):
         verbose_name = "Products Details"
         verbose_name_plural = "Products Details"  # Plural Form
 
-    def __str__(self):
-        return self.business_name or "Unnamed Business"
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')  # Relation to Product
-    image = models.ImageField(upload_to='product_images/')  # Image file
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='product_images/')  # Ensure this field name is correct
 
-    def __str__(self):
-        return f"Image for {self.product.name}"
 
 
 class Barcode(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='barcode')  # Relation to Product
-    barcode_value = models.CharField(max_length=100, unique=True)  # Unique barcode value
+    barcode_value = models.ImageField(upload_to='barcode_images/')  # Unique barcode value
     
-    # class Meta:
-    #     verbose_name = "Product Barcode Image"
-    #     verbose_name_plural = "User Details"  # Plural Form
-
-    def __str__(self):
-        return f"Barcode for {self.product.name}"
 
 class UserDetail(models.Model):
     business = models.OneToOneField(CategoryUsers, on_delete=models.CASCADE, related_name="user")

@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import datetime
-from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback
+from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback,  Product, ProductImage, Barcode
 
 
 User = get_user_model()  # Get the custom user model
@@ -155,5 +155,51 @@ def get_feedback(request, slug=None):
         # Return data as JSON
         return JsonResponse(data, safe=False, status=200)
 
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_products(request, slug=None):
+    # Saare products fetch karein
+    try:
+        user = request.user
+        # Check if slug is provided
+        if slug:
+            # Fetch specific employee using slug
+            products = Product.objects.filter(business=user, id=slug)  # Replace `id` with your slug field if it's different
+        else:
+            # Fetch all employees for the user
+            products = Product.objects.filter(business=user)
+
+        if not products.exists():
+            return JsonResponse({'error': 'No employee found with the given ID or slug'}, status=404)
+      
+        
+        # Response data prepare karna
+        response_data = []
+        for product in products:
+            
+            # Product images aur barcodes ko alag filter karna
+            product_images = ProductImage.objects.filter(product=product)
+            barcode_images = Barcode.objects.filter(product=product)
+            # Image URLs prepare karna
+            product_image_urls = ["https://superadmin.reviewpay.com.au"+image.image.url for image in product_images]
+            barcode_image_urls = ["https://superadmin.reviewpay.com.au"+image.barcode_value.url for image in barcode_images]
+
+            # Product data ko JSON mein add karna
+            response_data.append({
+                "id": product.id,
+                "name": product.product_name,
+                "price": str(product.product_price),
+                "description": product.product_description,
+                "product_images": product_image_urls,
+                "barcodes": barcode_image_urls,
+            })
+           
+        return JsonResponse({"products": response_data}, safe=False)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

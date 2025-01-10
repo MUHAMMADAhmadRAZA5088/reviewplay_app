@@ -28,7 +28,7 @@ from rest_framework import status
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.models import User
-from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback
+from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback, Barcode, ProductImage
 
 
 User = get_user_model()  # Get the custom user model
@@ -225,31 +225,33 @@ def product(request):
 
         # Parse the JSON data
         body = json.loads(request.body)
-        import pdb;pdb.set_trace()
-        name = body.get('name')
-        price = body.get('price')
-        description = body.get('description', '')
-        barcode_value = body.get('barcode')
-        images = body.get('images', [])
-
+        business = user
+        product_name = body.get('product_name')
+        product_description = body.get('product_description')
+        product_price = body.get('product_price')
+        barcode_value = body.get('barcode_images',[])
+        product_images = body.get('product_images', [])
         # Validate required fields
-        if not name or not price:
+        if not product_name or not product_price:
             return JsonResponse({'error': 'Name and Price are required'}, status=400)
 
         # Create the Product
         product = Product.objects.create(
-            name=name,
-            price=price,
-            description=description
+            business=business,
+            product_name=product_name,
+            product_price=product_price,
+            product_description=product_description
         )
 
         # Add Barcode (if provided)
         if barcode_value:
-            Barcode.objects.create(product=product, barcode_value=barcode_value)
-
+            for barcode in barcode_value:
+                Barcode.objects.create(product=product, barcode_value=image_decode(barcode))
+        
         # Add Images (if provided)
-        for img_url in images:
-            ProductImage.objects.create(product=product, image=img_url)
+        if product_images:
+            for img_url in product_images:
+                ProductImage.objects.create(product=product, image=image_decode(img_url))
 
         return JsonResponse({'message': 'Product created successfully', 'product_id': product.id}, status=201)
 
