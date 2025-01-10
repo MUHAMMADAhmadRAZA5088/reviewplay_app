@@ -222,8 +222,10 @@ def employee_detail(request):
 def product(request):
     user = request.user
     try:
+
         # Parse the JSON data
         body = json.loads(request.body)
+        import pdb;pdb.set_trace()
         name = body.get('name')
         price = body.get('price')
         description = body.get('description', '')

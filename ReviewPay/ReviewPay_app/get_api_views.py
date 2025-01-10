@@ -114,7 +114,7 @@ def get_employee_detail(request, slug=None):
                 'designation': employee.designation,
                 'email': employee.employee_email_address,
                 'working_since': employee.working_since,
-                'employee_profiles': f'https://superadmin.reviewpay.com.au/{employee.employee_profiles.url}' if employee.employee_profiles else None,
+                'employee_profiles': f'https://superadmin.reviewpay.com.au{employee.employee_profiles.url}' if employee.employee_profiles else None,
                 'user_email': employee.business.email
             })
 
