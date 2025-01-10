@@ -222,28 +222,42 @@ def employee_detail(request):
 def product(request):
     user = request.user
     try:
-        # Parse the incoming JSON data
-        product_data = json.loads(request.body)
-        # Check if required data is present
-        if not product_data:
-            return JsonResponse({'error': 'Invalid data.'}, status=400)
-        
-        
-        product = Product(  
-                            business=user,
-                            product_name = product_data['product_name'],
-                            product_description = product_data['product_description'],
-                            product_price = product_data['product_price'],
-                            product_images = image_decode(product_data['product_images'])
-                            )
+        # Parse the JSON data
+        body = json.loads(request.body)
+        name = body.get('name')
+        price = body.get('price')
+        description = body.get('description', '')
+        barcode_value = body.get('barcode')
+        images = body.get('images', [])
 
-        product.save()
-        return JsonResponse({'message': 'Product data added successfully.'}, status=200)
-    
-    except KeyError as e:
-        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+        # Validate required fields
+        if not name or not price:
+            return JsonResponse({'error': 'Name and Price are required'}, status=400)
+
+        # Create the Product
+        product = Product.objects.create(
+            name=name,
+            price=price,
+            description=description
+        )
+
+        # Add Barcode (if provided)
+        if barcode_value:
+            Barcode.objects.create(product=product, barcode_value=barcode_value)
+
+        # Add Images (if provided)
+        for img_url in images:
+            ProductImage.objects.create(product=product, image=img_url)
+
+        return JsonResponse({'message': 'Product created successfully', 'product_id': product.id}, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
