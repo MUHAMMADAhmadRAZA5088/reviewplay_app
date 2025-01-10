@@ -53,7 +53,6 @@ class Product(models.Model):
     product_name = models.CharField(max_length=255)
     product_description = models.TextField()
     product_price = models.CharField(max_length=255)
-    product_images = models.ImageField(upload_to='product_images/', blank=True, null=True)
 
     class Meta:
         verbose_name = "Products Details"
@@ -61,6 +60,21 @@ class Product(models.Model):
 
     def __str__(self):
         return self.business_name or "Unnamed Business"
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')  # Relation to Product
+    image = models.ImageField(upload_to='product_images/')  # Image file
+
+    def __str__(self):
+        return f"Image for {self.product.name}"
+
+
+class Barcode(models.Model):
+    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='barcode')  # Relation to Product
+    barcode_value = models.CharField(max_length=100, unique=True)  # Unique barcode value
+
+    def __str__(self):
+        return f"Barcode for {self.product.name}"
 
 class UserDetail(models.Model):
     business = models.OneToOneField(CategoryUsers, on_delete=models.CASCADE, related_name="user")
@@ -89,8 +103,6 @@ class Feedback(models.Model):
 # class UploadedImages(models.Model):
 #     business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="uploaded_images")
 #     business_images = models.ImageField(upload_to='business_images/')
-
-
 
 
 

@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views,api_views,get_api_views
 
 urlpatterns = [
+
     path('reviewpayrole_api/get_feedback/<int:slug>/', get_api_views.get_feedback, name='get_feedback'),
     path('reviewpayrole_api/get_feedback', get_api_views.get_feedback, name='get_feedback'),
     path('reviewpayrole_api/feedback', api_views.feedback, name='feedback'),

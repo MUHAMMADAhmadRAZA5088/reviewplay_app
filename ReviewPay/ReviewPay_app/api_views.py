@@ -21,8 +21,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.response import Response
+from rest_framework import status
 from django.utils import timezone
 from datetime import datetime
+from django.contrib.auth.models import User
 from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback
 
 
@@ -79,24 +84,26 @@ def api_signup(request):
     else:
         return JsonResponse({'error': 'Enter all fields again.'}, status=400)
 
-# Restful api login api
+
 @csrf_exempt
 def api_login(request):
-
     if request.method == 'POST':
         data = request.POST
         username = data.get('email')
         password = data.get('password')
+
         # Authenticate the user
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)  # Log the user in (creates a session)
+
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
+
             return JsonResponse({
-                'message': 'Login successfull!',
-                'role' : user.role,
+                'message': 'Login successful!',
+                'role': user.role,
                 'access_token': access_token,
                 'refresh_token': str(refresh)
             }, status=200)
@@ -115,7 +122,7 @@ class PasswordResetRequestView(APIView):
             user = User.objects.get(email=email)
             uid = urlsafe_base64_encode(str(user.pk).encode())
             token = default_token_generator.make_token(user)
-            reset_url =f'http://localhost:3000/SavePassword/{uid}/{token}/' 
+            reset_url =f'https://reviewpay.com.au/SavePassword/{uid}/{token}/' 
            
             # Send Email
             subject = 'Password Reset Request'
@@ -278,7 +285,6 @@ def user_detail(request):
             return JsonResponse({'error': str(e)}, status=500)
     else:
       return JsonResponse({'error': 'The role is not of a user.'}, status=400)  
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

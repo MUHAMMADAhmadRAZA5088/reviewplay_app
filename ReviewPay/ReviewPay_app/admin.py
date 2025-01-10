@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse  # Import reverse
 from django.utils.html import format_html  # Import format_html
 from django.utils.html import mark_safe
-from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback
+from .models import CategoryUsers, Businessdetail, Employee, Product, ProductImage, Barcode, UserDetail, Feedback
 
 from django.contrib import admin
 # from .models import CategoryUsers, Employee, Product, UploadedImages
@@ -66,6 +66,14 @@ class ProductAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
+
+@admin.register(ProductImage)
+class ProductImageAdmin(admin.ModelAdmin):
+    list_display = ('product', 'image')
+
+@admin.register(Barcode)
+class BarcodeAdmin(admin.ModelAdmin):
+    list_display = ('product', 'barcode_value')
 
 class UserDetailAdmin(admin.ModelAdmin):
     list_display = ('business', 'first_name', 'last_name', 'gender','date_of_birth','profile_image','delete_option')
