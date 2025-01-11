@@ -84,18 +84,38 @@ class UserDetail(models.Model):
         return self.first_name or "Unnamed Business"
 
 class Feedback(models.Model):
-    business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="category")
+    business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="verifications")
     issue_category = models.CharField(max_length=255)
     issue_description = models.TextField()
     urgency_level = models.CharField(max_length=255)
+
     class Meta:
         verbose_name = "Feedback"
         verbose_name_plural = "Feedback"  # Plural Form
 
-# # UploadedImages Model
-# class UploadedImages(models.Model):
-#     business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="uploaded_images")
-#     business_images = models.ImageField(upload_to='business_images/')
+class BusinessVerifications(models.Model):
+    business = models.OneToOneField(CategoryUsers, on_delete=models.CASCADE, related_name="category")
+    ACN = models.CharField(max_length=255)
+    business_web = models.CharField(max_length=255)
+    fullname_director_1 = models.CharField(max_length=255)
+    fullname_director_2 = models.CharField(max_length=255)
+    admin_phone_number = models.CharField(max_length=255)
+    business_phone_number = models.CharField(max_length=255)
+    facebook_link = models.CharField(max_length=255)
+    instra_link = models.CharField(max_length=255)
+    admin_email = models.CharField(max_length=255)
+    client_email = models.CharField(max_length=255)
+    openning_hours = models.CharField(max_length=255)
+    government_issue_document = models.ImageField(upload_to='verification_business/')
+    business_name_evidence = models.ImageField(upload_to='verification_business/')
+    company_extract_issue = models.ImageField(upload_to='verification_business/')
+
+    class Meta:
+        verbose_name = "Business Verification"
+        verbose_name_plural = "Business Verifications"  # Plural Form
+
+
+
 
 
 

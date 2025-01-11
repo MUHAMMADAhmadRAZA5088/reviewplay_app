@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse  # Import reverse
 from django.utils.html import format_html  # Import format_html
 from django.utils.html import mark_safe
-from .models import CategoryUsers, Businessdetail, Employee, Product, ProductImage, Barcode, UserDetail, Feedback
+from .models import CategoryUsers, Businessdetail, Employee, Product, ProductImage, Barcode, UserDetail, Feedback, BusinessVerifications
 
 from django.contrib import admin
 # from .models import CategoryUsers, Employee, Product, UploadedImages
@@ -88,6 +88,18 @@ class BarcodeAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
+
+@admin.register(BusinessVerifications)
+class BusinessVerificationsAdmin(admin.ModelAdmin):
+    list_display = ('business', 'ACN', 'delete_option')
+
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            delete_url
+        )
+
 class UserDetailAdmin(admin.ModelAdmin):
     list_display = ('business', 'first_name', 'last_name', 'gender','date_of_birth','profile_image','delete_option')
 

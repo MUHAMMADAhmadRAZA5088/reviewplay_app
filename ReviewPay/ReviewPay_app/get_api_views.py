@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import datetime
-from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback,  Product, ProductImage, Barcode
+from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, Product, UserDetail, Feedback,  Product, ProductImage, Barcode
 
 
 User = get_user_model()  # Get the custom user model
@@ -198,6 +198,43 @@ def get_products(request, slug=None):
             })
            
         return JsonResponse({"products": response_data}, safe=False)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_business_verification(request):
+    user = request.user
+    try :
+        business_verification = BusinessVerifications.objects.get(business=user)
+    except:
+        return JsonResponse({'error':'data is not find'}, status=404)
+
+    try:
+        data = {
+                'id': business_verification.id,
+                'ACN': business_verification.ACN,
+                'business_web' : business_verification.business_web,
+                'fullname_director_1' : business_verification.fullname_director_1,
+                'fullname_director_2': business_verification.fullname_director_2,  # Assuming you want to send the ID of the related business
+                'admin_phone_number': business_verification.admin_phone_number,
+                'business_phone_number': business_verification.business_phone_number,
+                'facebook_link': business_verification.facebook_link,
+                'instagram_link' : business_verification.instra_link,
+                'admin_email' : business_verification.admin_email,
+                'client_email' : business_verification.client_email,
+                'openning_hours' : business_verification.openning_hours,
+                'government_issue_document' : 'http://192.168.100.14:8000'+business_verification.government_issue_document.url if business_verification.government_issue_document else None,
+                'business_name_evidence' : 'http://192.168.100.14:8000'+business_verification.business_name_evidence.url if business_verification.business_name_evidence else None,
+                'company_extract_issue' : 'http://192.168.100.14:8000'+business_verification.company_extract_issue.url if business_verification.company_extract_issue else None,  # Check if profile_image exists,
+            }
+
+        # Return the data as JSON
+        return JsonResponse(data, safe=False, status=200)
 
     except KeyError as e:
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)

@@ -28,8 +28,9 @@ from rest_framework import status
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.models import User
-from .models import CategoryUsers, Businessdetail, Employee, Product, UserDetail, Feedback, Barcode, ProductImage
-
+from .models import CategoryUsers, Businessdetail, Employee, Product
+from .models import UserDetail, Feedback, Barcode, ProductImage
+from .models import BusinessVerifications
 
 User = get_user_model()  # Get the custom user model
 
@@ -316,6 +317,54 @@ def feedback(request):
                                            urgency_level = data['urgency_level']
                                            )
         return JsonResponse({'message': 'feedback add successfully.'}, status=200)
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def business_verifications(request):
+    user = request.user
+    try:
+        # Parse the incoming JSON data
+        business_data = json.loads(request.body)
+
+        # Check if required data is present
+        if not business_data:
+            return JsonResponse({'error': 'Invalid data.'}, status=400)
+
+        # Check if Businessdetail exists for the user; update or create accordingly
+        business_detail, created = BusinessVerifications.objects.update_or_create(
+            business=user,  # Check by the `business` field (OneToOne relation)
+            
+            defaults={
+                'ACN': business_data.get("ACN"),
+                'business_web': business_data.get("business_web"),
+                'fullname_director_1': business_data.get("fullname_director_1"),
+                'fullname_director_2': business_data.get("fullname_director_2"),
+                'admin_phone_number': business_data.get("admin_phone_number"),
+                'business_phone_number': business_data.get("business_phone_number"),
+                'facebook_link': business_data.get("facebook_link"),
+                'instra_link': business_data.get("instra_link"),
+                'admin_email': business_data.get("admin_email"),
+                'client_email': business_data.get("client_email"),
+                'openning_hours': business_data.get("openning_hours"),
+                'government_issue_document' : image_decode(business_data.get('government_issue_document')),
+                'business_name_evidence' : image_decode(business_data.get('business_name_evidence')),
+                'company_extract_issue' : image_decode(business_data.get('company_extract_issue')),
+
+            }
+        )
+
+        if created:
+            message = 'Business verifications data added successfully.'
+        else:
+            message = 'Business verifications data updated successfully.'
+
+        return JsonResponse({'message': message}, status=200)
+
     except KeyError as e:
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
