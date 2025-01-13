@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenRefreshView
-from . import views,api_views,get_api_views
+from . import views,api_views,get_api_views,delete_view
 
 urlpatterns = [
 
@@ -17,6 +17,7 @@ urlpatterns = [
     path('reviewpayrole_api/business/products_detail', api_views.product, name='products_detals'),
     path('reviewpayrole_api/get_products',get_api_views.get_products, name="get_products"),
     path('reviewpayrole_api/get_products/<int:slug>/',get_api_views.get_products, name="get_products_with_id"),
+    path('reviewpayrole_api/delete_product/<int:slug>/',delete_view.delete_product, name="delete_product"),
     path('reviewpayrole_api/business/employee_detail', api_views.employee_detail, name='employee_detail'),
     path('reviewpayrole_api/business/business_detail', api_views.create_or_update_business_detail, name='business_detail'),
     path('reviewpayrole_api/business/business_verification', api_views.business_verifications, name='business_verification'),   

@@ -3,10 +3,10 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse  # Import reverse
 from django.utils.html import format_html  # Import format_html
 from django.utils.html import mark_safe
-from .models import CategoryUsers, Businessdetail, Employee, Product, ProductImage, Barcode, UserDetail, Feedback, BusinessVerifications
-
+from .models import CategoryUsers, Businessdetail, Employee, Product
+from .models import BusinessState, ProductImage, Barcode, UserDetail
+from .models import Feedback, BusinessVerifications
 from django.contrib import admin
-# from .models import CategoryUsers, Employee, Product, UploadedImages
 from django.contrib.auth.admin import UserAdmin
 
 # Custom User Admin
@@ -32,7 +32,7 @@ class CategoryUsersAdmin(UserAdmin):
 
 # Register the Businessdetail model with its own admin class
 class BusinessdetailAdmin(admin.ModelAdmin):
-    list_display = ('business', 'business_name', 'category', 'sub_category', 'abn_number','delete_option')
+    list_display = ('business', 'business_name', 'category', 'sub_category', 'abn_number','businessLogo','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):
@@ -122,6 +122,51 @@ class FeedbackAdmin(admin.ModelAdmin):
             delete_url
         )
 
+
+class BusinessStateAdmin(admin.ModelAdmin):
+    list_display = (
+        'product_name',  # Product name
+        'quality',       # Editable field
+        'quality_progress_bar', 
+        'performance',   # Editable field
+        'performance_progress_bar', 
+        'easy_to_use',   # Editable field
+        'easy_to_use_progress_bar', 
+        'durability',    # Editable field
+        'durability_progress_bar', 
+    )
+    list_editable = ('quality', 'performance', 'easy_to_use', 'durability')  # Editable fields
+
+    # Quality Progress Bar
+    def quality_progress_bar(self, obj):
+        return self._generate_progress_bar(obj.quality)
+    quality_progress_bar.short_description = 'Quality Progress'
+
+    # Performance Progress Bar
+    def performance_progress_bar(self, obj):
+        return self._generate_progress_bar(obj.performance)
+    performance_progress_bar.short_description = 'Performance Progress'
+
+    # Easy to Use Progress Bar
+    def easy_to_use_progress_bar(self, obj):
+        return self._generate_progress_bar(obj.easy_to_use)
+    easy_to_use_progress_bar.short_description = 'Easy to Use Progress'
+
+    # Durability Progress Bar
+    def durability_progress_bar(self, obj):
+        return self._generate_progress_bar(obj.durability)
+    durability_progress_bar.short_description = 'Durability Progress'
+
+    # Helper Function to Generate Progress Bar
+    def _generate_progress_bar(self, value):
+        return format_html(
+            '<div style="width: 100%; background-color: #f3f3f3; border: 1px solid #ddd;">'
+            '<div style="width: {}%; background-color: #4caf50; padding: 5px 0; color: white; text-align: center;">'
+            '{}%</div></div>',
+            value, value
+        )
+
+admin.site.register(BusinessState, BusinessStateAdmin)
 admin.site.register(Feedback, FeedbackAdmin)
 admin.site.register(UserDetail, UserDetailAdmin)
 admin.site.register(Product, ProductAdmin)

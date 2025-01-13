@@ -3,7 +3,7 @@ import threading
 import time
 import base64
 import os
-import uuid
+from uuid import uuid4
 
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
@@ -50,40 +50,48 @@ def businessImages(user, businessImages):
         UploadedImages.objects.create(business = user,business_images = business_images)
 
 # Restful signup api
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import CategoryUsers
+
 @csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
 def api_signup(request):
     if request.method == 'POST':
-        user_data = json.loads(request.body)
-        data = user_data['createAccount']
-        name = data['username']
-        email = data['email']
-        password = data['password']
-        confirm_password = data['confirmPassword']
-        role = data.get('role')
+        # Fetch data from the form
+        name = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirmPassword')
+        role = request.POST.get('role')
         
-        if bool(name) == False or bool(email)== False or bool(password) == False :
-            return JsonResponse({'error': 'username,email and password is required'}, status=400)
+        # Validation for required fields
+        if not name or not email or not password:
+            return JsonResponse({'error': 'Username, email, and password are required'}, status=400)
 
+        # Check if passwords match
         if password != confirm_password:
             return JsonResponse({'error': 'Passwords do not match'}, status=400)
-        # Check if the role is "business"
- 
-        # Check if the role is "user"
+
+        # Role validation
         if role == 'user' or role == 'business':
             try:
+                # Create user
                 user = CategoryUsers.objects.create_user(
-                                    username=email, name=name, email=email,
-                                    password=password, role=role
-                                                        )
-                user.save
-                return JsonResponse({'message': 'User add Successfully'}, status=201)
-            except:
+                    username=email, 
+                    name=name, 
+                    email=email,
+                    password=password, 
+                    role=role
+                )
+                user.save()
+                return JsonResponse({'message': 'User added successfully'}, status=201)
+            except Exception as e:
                 return JsonResponse({'error': 'Email already exists'}, status=400)
         else:
-            return JsonResponse({'error': 'Invalid role User'}, status=400)
+            return JsonResponse({'error': 'Invalid role. Must be "user" or "business"'}, status=400)
       
     else:
-        return JsonResponse({'error': 'Enter all fields again.'}, status=400)
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
 
 
 @csrf_exempt
@@ -116,22 +124,22 @@ def api_login(request):
 # Password Reset Request View
 class PasswordResetRequestView(APIView):
     def post(self, request):
-        body = json.loads(request.body)
-        email = body.get('email')
-       
-        try:
-            user = User.objects.get(email=email)
-            uid = urlsafe_base64_encode(str(user.pk).encode())
-            token = default_token_generator.make_token(user)
-            reset_url =f'https://reviewpay.com.au/SavePassword/{uid}/{token}/' 
-           
-            # Send Email
-            subject = 'Password Reset Request'
-            message = f'Click the link below to reset your password:\n{reset_url}'
-            send_mail(subject, message, 'ahmadelectricaltraders@gmail.com', [email])
-            return JsonResponse({'message': 'Password reset link has been sent to your email.'}, status=200)
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'User with this email does not exist.'}, status=400)
+        if request.method == 'POST':
+            email = request.POST.get('email')
+    
+            try:
+                user = User.objects.get(email=email)
+                uid = urlsafe_base64_encode(str(user.pk).encode())
+                token = default_token_generator.make_token(user)
+                reset_url =f'https://reviewpay.com.au/SavePassword/{uid}/{token}/' 
+            
+                # Send Email
+                subject = 'Password Reset Request'
+                message = f'Click the link below to reset your password:\n{reset_url}'
+                send_mail(subject, message, 'ahmadelectricaltraders@gmail.com', [email])
+                return JsonResponse({'message': 'Password reset link has been sent to your email.'}, status=200)
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User with this email does not exist.'}, status=400)
 
 # Reset Password View
 class ResetPasswordView(APIView):
@@ -157,17 +165,23 @@ def create_or_update_business_detail(request):
     user = request.user
     try:
         # Parse the incoming JSON data
-        business_data = json.loads(request.body)
-
+        business_data = request.POST
         # Check if required data is present
         if not business_data:
             return JsonResponse({'error': 'Invalid data.'}, status=400)
 
+        business_logo = request.FILES.get("businessLogo")
         # Check if Businessdetail exists for the user; update or create accordingly
+        # Construct a new file name using user's email, ID, or username
+        file_extension = os.path.splitext(business_logo.name)[1]  # Get file extension (e.g., .jpg, .png)
+        new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
+
+        # Save the file to the media directory manually
+        business_logo.name = new_file_name  # Assign the new name
         business_detail, created = Businessdetail.objects.update_or_create(
             business=user,  # Check by the `business` field (OneToOne relation)
             defaults={
-                'businessLogo': image_decode(business_data.get("businessLogo")),
+                'businessLogo': business_logo,
                 'category': business_data.get("category"),
                 'sub_category': business_data.get("subCategory"),
                 'abn_number': business_data.get("abnNumber"),
@@ -328,33 +342,37 @@ def feedback(request):
 def business_verifications(request):
     user = request.user
     try:
-        # Parse the incoming JSON data
-        business_data = json.loads(request.body)
-
+        # Get JSON data and files
+        business_data = request.data  # Use request.data to handle both form data and files
+        files = request.FILES
         # Check if required data is present
         if not business_data:
             return JsonResponse({'error': 'Invalid data.'}, status=400)
 
+        # Extract file fields if present
+        government_issue_document = files.get('government_issue_document')  # Handle uploaded file
+        business_name_evidence = files.get('business_name_evidence')
+        company_extract_issue = files.get('company_extract_issue')
+
         # Check if Businessdetail exists for the user; update or create accordingly
         business_detail, created = BusinessVerifications.objects.update_or_create(
             business=user,  # Check by the `business` field (OneToOne relation)
-            
+
             defaults={
-                'ACN': business_data.get("ACN"),
+                'ACN': business_data.get("acn"),
                 'business_web': business_data.get("business_web"),
                 'fullname_director_1': business_data.get("fullname_director_1"),
                 'fullname_director_2': business_data.get("fullname_director_2"),
                 'admin_phone_number': business_data.get("admin_phone_number"),
                 'business_phone_number': business_data.get("business_phone_number"),
                 'facebook_link': business_data.get("facebook_link"),
-                'instra_link': business_data.get("instra_link"),
+                'instra_link': business_data.get("instragram_link"),
                 'admin_email': business_data.get("admin_email"),
                 'client_email': business_data.get("client_email"),
                 'openning_hours': business_data.get("openning_hours"),
-                'government_issue_document' : image_decode(business_data.get('government_issue_document')),
-                'business_name_evidence' : image_decode(business_data.get('business_name_evidence')),
-                'company_extract_issue' : image_decode(business_data.get('company_extract_issue')),
-
+                'government_issue_document': government_issue_document,
+                'business_name_evidence': business_name_evidence,
+                'company_extract_issue': company_extract_issue,
             }
         )
 

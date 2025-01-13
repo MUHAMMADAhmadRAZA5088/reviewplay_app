@@ -15,7 +15,7 @@ class CategoryUsers(AbstractUser):
 
 class Businessdetail(models.Model):
     business = models.OneToOneField(CategoryUsers, on_delete=models.CASCADE, related_name="businesses")
-    businessLogo = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+    businessLogo = models.ImageField(upload_to='business_logo/', null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True)
     sub_category = models.CharField(max_length=100, null=True, blank=True)
     abn_number = models.CharField(max_length=20, null=True, blank=True)
@@ -75,7 +75,7 @@ class UserDetail(models.Model):
     last_name = models.TextField()
     gender = models.CharField(max_length=255)
     date_of_birth  = models.DateField()
-    profile_image = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    profile_image = models.ImageField(upload_to='user_images/', blank=True, null=True)
     class Meta:
         verbose_name = "User Detail"
         verbose_name_plural = "User Details"  # Plural Form
@@ -106,14 +106,27 @@ class BusinessVerifications(models.Model):
     admin_email = models.CharField(max_length=255)
     client_email = models.CharField(max_length=255)
     openning_hours = models.CharField(max_length=255)
-    government_issue_document = models.ImageField(upload_to='verification_business/')
-    business_name_evidence = models.ImageField(upload_to='verification_business/')
-    company_extract_issue = models.ImageField(upload_to='verification_business/')
+    government_issue_document = models.ImageField(upload_to=f'verification_business_government_issue_document/')
+    business_name_evidence = models.ImageField(upload_to=f'verification_business_business_name_evidence')
+    company_extract_issue = models.ImageField(upload_to=f'verification_business_company_extract_issue')
 
     class Meta:
         verbose_name = "Business Verification"
         verbose_name_plural = "Business Verifications"  # Plural Form
 
+
+
+from django.db import models
+
+class BusinessState(models.Model):
+    product_name = models.CharField(max_length=200)
+    quality = models.IntegerField(default=0)        # Progress: 0-100
+    performance = models.IntegerField(default=0)    # Progress: 0-100
+    easy_to_use = models.IntegerField(default=0)    # Progress: 0-100
+    durability = models.IntegerField(default=0)     # Progress: 0-100
+
+    def __str__(self):
+        return self.product_name
 
 
 
