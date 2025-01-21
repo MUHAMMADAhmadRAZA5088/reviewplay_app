@@ -2,10 +2,10 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenRefreshView
-from . import views,api_views,get_api_views,delete_view
+from . import views,api_views,get_api_views,delete_view,google_view
 
 urlpatterns = [
-
+    path('reviewpayrole_api/get_statistics',get_api_views.get_business_state, name='get_statistics'),
     path('reviewpayrole_api/get_feedback/<int:slug>/', get_api_views.get_feedback, name='get_feedback'),
     path('reviewpayrole_api/get_feedback', get_api_views.get_feedback, name='get_feedback'),
     path('reviewpayrole_api/feedback', api_views.feedback, name='feedback'),
@@ -27,5 +27,8 @@ urlpatterns = [
     path('reviewpayrole_api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('reviewpayrole_api/password-reset/', api_views.PasswordResetRequestView.as_view(), name='password_reset_request'),
     path('reviewpayrole_api/password-reset/<uidb64>/<token>/', api_views.ResetPasswordView.as_view(), name='password_reset_confirm'),
-
+    # Google Login
+    path('api/auth/social/google', google_view.GoogleLogin.as_view(), name='google_login'),
+    # logout 
+    path('logout/', api_views.LogoutView.as_view(), name='logout'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

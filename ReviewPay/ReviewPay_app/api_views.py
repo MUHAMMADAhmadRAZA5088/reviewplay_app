@@ -171,13 +171,10 @@ def create_or_update_business_detail(request):
             return JsonResponse({'error': 'Invalid data.'}, status=400)
 
         business_logo = request.FILES.get("businessLogo")
-        # Check if Businessdetail exists for the user; update or create accordingly
-        # Construct a new file name using user's email, ID, or username
         file_extension = os.path.splitext(business_logo.name)[1]  # Get file extension (e.g., .jpg, .png)
         new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
-
-        # Save the file to the media directory manually
         business_logo.name = new_file_name  # Assign the new name
+
         business_detail, created = Businessdetail.objects.update_or_create(
             business=user,  # Check by the `business` field (OneToOne relation)
             defaults={
@@ -209,19 +206,23 @@ def employee_detail(request):
     user = request.user
     try:
         # Parse the incoming JSON data
-        employee_data = json.loads(request.body)
+        employee_data = request.POST
+        employee_profiles = request.FILES.get("employee_profiles")
+        file_extension = os.path.splitext(employee_profiles.name)[1]  # Get file extension (e.g., .jpg, .png)
+        new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
+        employee_profiles.name = new_file_name  # Assign the new name
         # Check if required data is present
         if not employee_data:
             return JsonResponse({'error': 'Invalid data.'}, status=400)
         
         employee = Employee(
             business=user,
-            employee_name = employee_data['employee_name'],
-            identification_number = employee_data['identification_number'],
-            working_since = employee_data['working_since'],
+            employee_name = employee_data.get('employee_name'),
+            identification_number = employee_data.get('identification_number'),
+            working_since = employee_data.get('working_since'),
             designation = employee_data['designation'],
-            employee_email_address = employee_data['employee_email_address'],
-            employee_profiles = image_decode(employee_data['employee_profiles'])
+            employee_email_address = employee_data.get('employee_email_address'),
+            employee_profiles = employee_profiles
                             )
 
         employee.save()
@@ -235,48 +236,37 @@ def employee_detail(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def product(request):
-    user = request.user
     try:
-
-        # Parse the JSON data
-        body = json.loads(request.body)
-        business = user
-        product_name = body.get('product_name')
-        product_description = body.get('product_description')
-        product_price = body.get('product_price')
-        barcode_value = body.get('barcode_images',[])
-        product_images = body.get('product_images', [])
+        # Extract form data
+        product_name = request.POST.get('product_name')
+        product_price = request.POST.get('product_price')
+        product_description = request.POST.get('product_description', '')
         # Validate required fields
         if not product_name or not product_price:
             return JsonResponse({'error': 'Name and Price are required'}, status=400)
 
         # Create the Product
         product = Product.objects.create(
-            business=business,
+            business=request.user,
             product_name=product_name,
             product_price=product_price,
             product_description=product_description
         )
 
-        # Add Barcode (if provided)
-        if barcode_value:
-            for barcode in barcode_value:
-                Barcode.objects.create(product=product, barcode_value=image_decode(barcode))
-        
-        # Add Images (if provided)
-        if product_images:
-            for img_url in product_images:
-                ProductImage.objects.create(product=product, image=image_decode(img_url))
+        # Handle barcodes (if provided)
+        barcodes = request.POST.getlist('barcode_images', [])
+        for barcode in barcodes:
+            Barcode.objects.create(product=product, barcode_value=image_decode(barcode))
+
+        # Handle product images (if provided)
+        product_images = request.FILES.getlist('product_images')
+        for image in product_images:
+            ProductImage.objects.create(product=product, image=image)
 
         return JsonResponse({'message': 'Product created successfully', 'product_id': product.id}, status=201)
 
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -285,25 +275,22 @@ def user_detail(request):
     if 'user' == request.user.role:
 
         try:
-            # Parse the incoming JSON data
-            user_data = json.loads(request.body)
-        
-            image = image_decode(user_data['profile_image'])
+            
+            image = request.FILES.get('image')
+            file_extension = os.path.splitext(image.name)[1]  # Get file extension (e.g., .jpg, .png)
+            new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
+            image.name = new_file_name  # Assign the new name
             # Check if required data is present
-            if not user_data:
-                return JsonResponse({'error': 'Invalid data.'}, status=400)
 
-        
             user_detail, created = UserDetail.objects.update_or_create(
                                     business = user,
                                     defaults = {
-                                     'first_name' : user_data['first_name'],
-                                     'last_name' : user_data['last_name'],
-                                     'gender' : user_data['gender'],
-                                     'date_of_birth' : datetime.strptime(user_data['date_of_birth'], '%d-%m-%Y').date(),
+                                     'first_name' : request.POST.get('first_name'),
+                                     'last_name' : request.POST.get('last_name'),
+                                     'gender' : request.POST.get('gender'),
+                                     'date_of_birth' : datetime.strptime(request.POST.get('date_of_birth'), '%d-%m-%Y').date(),
                                      'profile_image' : image
-                                    }
-                                    )
+                                    })
         
             if created:
                 message = 'User Detail data added successfully.'
@@ -387,3 +374,16 @@ def business_verifications(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+
+class LogoutView(APIView):
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Logout successful"}, status=200)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)

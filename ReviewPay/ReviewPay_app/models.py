@@ -30,6 +30,14 @@ class Businessdetail(models.Model):
         return self.business_name or "Unnamed Business"
 
 
+class BusinessVideo(models.Model):
+    business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name="business_video")
+    video = models.FileField(upload_to='business_videos/', null=True, blank=True)
+
+class BusinessImage(models.Model):
+    business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name="business_image")
+    image = models.FileField(upload_to='business_images/', null=True, blank=True)
+
 # Employee Model
 class Employee(models.Model):
     business = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="employees")
