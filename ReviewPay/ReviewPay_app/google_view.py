@@ -32,8 +32,7 @@ class GoogleLogin(APIView):
                 except CategoryUsers.DoesNotExist:
                     return Response({'error': 'Signup are required'})
                 token = get_jwt_token(user)
-            
-                return Response({'access_token': token['access_token'],'refresh': token['refresh'] ,'username': user_email})
+                return Response({'access_token': token['access_token'],'refresh': token['refresh'] ,'username': user_email,'role':user.role})
 
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

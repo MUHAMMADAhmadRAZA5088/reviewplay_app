@@ -10,8 +10,8 @@ def get_id_token_with_code_method_1(code):
     token_endpoint = "https://oauth2.googleapis.com/token"
     payload = {
         'code': code,
-        'client_id': '',
-        'client_secret': '',
+        'client_id': '225953158255-q12ir2btvb6kidbvk1hjgk0gj1lkoih1.apps.googleusercontent.com',
+        'client_secret': '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',
         'redirect_uri': redirect_uri,
         'grant_type': 'authorization_code',
     }
