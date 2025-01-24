@@ -168,7 +168,7 @@ class BusinessStateAdmin(admin.ModelAdmin):
 
 
 class CommingsoonLoginAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'phone_number','delete_option')
+    list_display = ('id','name', 'email', 'phone_number','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):
