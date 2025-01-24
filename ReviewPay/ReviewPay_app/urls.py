@@ -5,6 +5,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views,api_views,get_api_views,delete_view,google_view
 
 urlpatterns = [
+    # commimg soon api
+    path('reviewpayrole_api/commingsoon',api_views.commingsoon, name='comming_soon_user'),
     path('reviewpayrole_api/get_statistics',get_api_views.get_business_state, name='get_statistics'),
     path('reviewpayrole_api/get_feedback/<int:slug>/', get_api_views.get_feedback, name='get_feedback'),
     path('reviewpayrole_api/get_feedback', get_api_views.get_feedback, name='get_feedback'),
@@ -29,6 +31,9 @@ urlpatterns = [
     path('reviewpayrole_api/password-reset/<uidb64>/<token>/', api_views.ResetPasswordView.as_view(), name='password_reset_confirm'),
     # Google Login
     path('api/auth/social/google', google_view.GoogleLogin.as_view(), name='google_login'),
+    # FaceBook Login
+    path('api/auth/social/facebook', google_view.FacebookLogin.as_view(), name='facebook_login'),
     # logout 
+
     path('logout/', api_views.LogoutView.as_view(), name='logout'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

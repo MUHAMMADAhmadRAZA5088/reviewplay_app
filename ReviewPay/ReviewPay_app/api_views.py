@@ -30,7 +30,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import UserDetail, Feedback, Barcode, ProductImage
-from .models import BusinessVerifications
+from .models import BusinessVerifications,CommingsoonLogin
 
 User = get_user_model()  # Get the custom user model
 
@@ -387,3 +387,33 @@ class LogoutView(APIView):
             return Response({"message": "Logout successful"}, status=200)
         except Exception as e:
             return Response({"error": str(e)}, status=400)
+
+
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+def commingsoon(request):
+    if request.method == 'POST':
+        # Fetch data from the form
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+
+
+
+        # Validation for required fields
+        if not name or not email or not phone_number:
+            return JsonResponse({'error': 'Username, email, and password are required'}, status=400)
+
+        # Role validation
+        if email:
+            try:
+                # Create user
+                user = CommingsoonLogin.objects.create(name = name, email = email,phone_number = phone_number)
+                user.save()
+                return JsonResponse({'message': 'User added successfully'}, status=201)
+            except Exception as e:
+                return JsonResponse({'error': 'Email already exists'}, status=400)
+        else:
+            return JsonResponse({'error': 'Invalid role. Must be "user" or "business"'}, status=400)
+      
+    else:
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)

@@ -26,7 +26,27 @@ class GoogleLogin(APIView):
                 code = request.data['code']
                 id_token = utils.get_id_token_with_code_method_1(code)
                 user_email = id_token['email']
-                
+                try:
+                    user = CategoryUsers.objects.get(email=user_email)
+                except CategoryUsers.DoesNotExist:
+                    return Response({'error': 'Signup are required'})
+                token = get_jwt_token(user)
+                return Response({'access_token': token['access_token'],'refresh': token['refresh'] ,'username': user_email,'role':user.role})
+
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        except KeyError as e:
+            return Response({'error': f'Missing key: {str(e)}'}, status=400)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+
+class FacebookLogin(APIView):
+
+    def post(self, request):
+        try:
+            user_email = request.data["email"]  
+            if user_email:
+               
                 try:
                     user = CategoryUsers.objects.get(email=user_email)
                 except CategoryUsers.DoesNotExist:

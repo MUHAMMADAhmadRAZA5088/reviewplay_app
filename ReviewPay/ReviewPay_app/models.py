@@ -137,6 +137,15 @@ class BusinessState(models.Model):
         return self.product_name
 
 
+class CommingsoonLogin(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField(default=0)    
+    phone_number = models.CharField(max_length=15)  
+
+    class Meta:
+        verbose_name = "CommingsoonLogin"
+        verbose_name_plural = "CommingsoonLogin"  # Plural Form
+
 
 
 
