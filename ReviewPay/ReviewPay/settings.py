@@ -162,6 +162,10 @@ JAZZMIN_SETTINGS = {
     # Whether to show the UI customizer on the sidebar
     "show_ui_builder": False,
 
+    "custom_css": "css/custom.css",  # Static folder ka path
+
+    # Copyright on the footer
+    "copyright": "reviewpayrol.com.au",
 
 }
 
@@ -177,7 +181,7 @@ JAZZMIN_UI_TWEAKS = {
     "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": True,
-    "sidebar_fixed": True,
+    "sidebar_fixed": False,
     "sidebar": "sidebar-light-navy",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
@@ -190,12 +194,13 @@ JAZZMIN_UI_TWEAKS = {
     "button_classes": {
         "primary": "btn-primary",
         "secondary": "btn-secondary",
-        "info": "btn-outline-info",
-        "warning": "btn-outline-warning",
-        "danger": "btn-outline-danger",
-        "success": "btn-outline-success"
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
     },
-    "actions_sticky_top": False
+    "actions_sticky_top": False,
+ 
 }
 
 
