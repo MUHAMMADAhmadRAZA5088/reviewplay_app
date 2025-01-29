@@ -95,3 +95,7 @@
     background-color: #e019ee; 
     border-color: #e019ee;
 }
+
+.jazzmin-login-page {
+    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
+}
