@@ -16,8 +16,8 @@
 
 
 .sidebar {
-  
-    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
+    background: #001f3f !important;
+    color: #fff;
 }
 
 .accent-navy .dropdown-item.active, .accent-navy .dropdown-item:active {
@@ -55,7 +55,7 @@
     .sidebar-mini.sidebar-collapse .main-sidebar, .sidebar-mini.sidebar-collapse .main-sidebar::before {
         margin-left: 0;
         width: 4.6rem;
-        background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
+        background: #001f3f;
     }
 }
 
@@ -97,5 +97,53 @@
 }
 
 .jazzmin-login-page {
-    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
+    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);;
 }
+
+.nav-header {
+    background-color: inherit;
+    color:  #fff !important;
+}
+.sidebar a {
+    color: #fff !important;
+}
+.sidebar-dark-navy .nav-sidebar>.nav-item>.nav-link.active, .sidebar-light-navy .nav-sidebar>.nav-item>.nav-link.active {
+    background-color: #0298cc !important;
+    color: #fff;
+}
+
+.breadcrumb-item {
+    color: #fff;
+}
+.breadcrumb-item+.breadcrumb-item::before {
+    float: left;
+    padding-right: .5rem;
+    color: #fff !important;
+    content: "/";
+}
+.border-right {
+    border-right: 1px solid #fff !important;
+}
+.border-right {
+    border-right: 1px solid #fff !important;
+    color: #001f3f;
+}
+.breadcrumb-item.active {
+    color: #001f3f !important;
+}
+.table thead th {
+    color: #fff;
+    border-bottom: 0;
+}
+.action-counter{
+    color: #001f3f;
+}
+.dataTables_info{
+    color: #001f3f;
+}
+a.btn-secondary {
+    font-weight: bold;
+    color: #fff;
+    background : #d9230f !important;
+    border-color: #d9230f !important;
+    }

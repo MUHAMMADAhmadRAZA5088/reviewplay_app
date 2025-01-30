@@ -16,8 +16,7 @@
 
 
 .sidebar {
-  
-    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
+    background-color: #001f3f;
 }
 
 .accent-navy .dropdown-item.active, .accent-navy .dropdown-item:active {
@@ -55,7 +54,7 @@
     .sidebar-mini.sidebar-collapse .main-sidebar, .sidebar-mini.sidebar-collapse .main-sidebar::before {
         margin-left: 0;
         width: 4.6rem;
-        background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
+        background: #001f3f;
     }
 }
 
@@ -97,5 +96,5 @@
 }
 
 .jazzmin-login-page {
-    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
+    background: #001f3f;
 }
