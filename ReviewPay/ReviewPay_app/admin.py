@@ -174,9 +174,17 @@ class CommingsoonLoginAdmin(admin.ModelAdmin):
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
+
+        delete_option.allow_tags = True
+        delete_option.short_description = "Delete"
+
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
 admin.site.register(CommingsoonLogin, CommingsoonLoginAdmin)
 admin.site.register(BusinessState, BusinessStateAdmin)
 admin.site.register(Feedback, FeedbackAdmin)
