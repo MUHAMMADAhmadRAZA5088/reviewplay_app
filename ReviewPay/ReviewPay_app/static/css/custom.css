@@ -1,6 +1,6 @@
 /* Admin header background color */
 .content-wrapper {
-    background: #68ccb3;
+    background: #fff;
 }
 .card {
     background-color: #001f3f;
@@ -11,7 +11,7 @@
     color: #e9eef2;
 }
 .accent-navy .btn-link:hover, .accent-navy .nav-tabs .nav-link:hover, .accent-navy a:not(.dropdown-item):not(.btn-app):not(.nav-link):not(.brand-link):not(.page-link):not(.btn):hover {
-    color: #68ccb3;
+    color: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
 }
 
 
@@ -97,7 +97,7 @@
 }
 
 .jazzmin-login-page {
-    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);;
+    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%);
 }
 
 .nav-header {
@@ -108,31 +108,32 @@
     color: #fff !important;
 }
 .sidebar-dark-navy .nav-sidebar>.nav-item>.nav-link.active, .sidebar-light-navy .nav-sidebar>.nav-item>.nav-link.active {
-    background-color: #0298cc !important;
+    background: linear-gradient(180deg, #3DE9DC 9.81%, #889EE7 57.13%, #DC3DF7 100.91%) !important;
     color: #fff;
 }
 
 .breadcrumb-item {
-    color: #fff;
+    color: #001f3f !important;
+}
+.breadcrumb-item a {
+    color: #001f3f !important;
 }
 .breadcrumb-item+.breadcrumb-item::before {
     float: left;
     padding-right: .5rem;
-    color: #fff !important;
+    color: #001f3f !important;
     content: "/";
 }
+
 .border-right {
-    border-right: 1px solid #fff !important;
-}
-.border-right {
-    border-right: 1px solid #fff !important;
+    /* border-right: 1px solid #fff !important; */
     color: #001f3f;
 }
 .breadcrumb-item.active {
     color: #001f3f !important;
 }
 .table thead th {
-    color: #fff;
+    color: #001f3f;
     border-bottom: 0;
 }
 .action-counter{
@@ -141,6 +142,9 @@
 .dataTables_info{
     color: #001f3f;
 }
+
+
+/* buttons */
 a.btn-secondary {
     color: #fff !important;
     background-color: #d115e0 !important;
