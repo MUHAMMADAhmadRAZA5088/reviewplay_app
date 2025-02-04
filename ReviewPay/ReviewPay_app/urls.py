@@ -5,7 +5,12 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views,api_views,get_api_views,delete_view,google_view
 
 urlpatterns = [
+
+    # cashback api
+    path('reviewpayrole_api/create_review_cashback/', api_views.create_review_cashback, name='create_review_cashback'),
+    path('reviewpayrole_api/create_referral_cashback/', api_views.create_referral_cashback, name='create_referral_cashback'),
     # commimg soon api
+    path('reviewpayrole_api/business_video_images', api_views.upload_business_video_and_image,name='business_video_images'),
     path('reviewpayrole_api/commingsoon',api_views.commingsoon, name='comming_soon_user'),
     path('reviewpayrole_api/get_statistics',get_api_views.get_business_state, name='get_statistics'),
     path('reviewpayrole_api/get_feedback/<int:slug>/', get_api_views.get_feedback, name='get_feedback'),

@@ -15,7 +15,6 @@ class CategoryUsers(AbstractUser):
 
 class Businessdetail(models.Model):
     business = models.OneToOneField(CategoryUsers, on_delete=models.CASCADE, related_name="businesses")
-    businessLogo = models.ImageField(upload_to='business_logo/', null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True)
     sub_category = models.CharField(max_length=100, null=True, blank=True)
     abn_number = models.CharField(max_length=20, null=True, blank=True)
@@ -34,9 +33,65 @@ class BusinessVideo(models.Model):
     business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name="business_video")
     video = models.FileField(upload_to='business_videos/', null=True, blank=True)
 
+class BusinessLogo(models.Model):
+    business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name="business_logo")
+    image = models.FileField(upload_to='business_logo//', null=True, blank=True)
+
 class BusinessImage(models.Model):
     business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name="business_image")
     image = models.FileField(upload_to='business_images/', null=True, blank=True)
+
+
+
+# Model for Review Cashback Settings
+class ReviewCashback(models.Model):
+    business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name="ReviewCashback")
+    review_amount_cashback_percent = models.IntegerField(
+        choices=[(i, f'{i}%') for i in range(1, 21)], default=1, verbose_name="Review Amount Cashback %"
+    )
+    review_amount_cashback_fixed = models.IntegerField(
+        choices=[(i, f'{i}') for i in range(1, 51)], default=1, verbose_name="Review Amount Cashback Fixed"
+    )
+    review_cashback_return_refund_period = models.IntegerField(
+        choices=[(i, f'{i}') for i in range(1, 61)], default=1, verbose_name="Review Cashback Return and Refund Period"
+    )
+    review_cashback_expiry = models.CharField(
+        max_length=10, choices=[('3 months', '3 months'), ('6 months', '6 months'), ('9 months', '9 months'), ('12 months', '12 months')],
+        default='3 months', verbose_name="Review Cashback Expiry"
+    )
+
+    def __str__(self):
+        return f"Review Cashback Settings - {self.review_amount_cashback_percent}%"
+
+    class Meta:
+        verbose_name = "Review Cashback Setting"
+        verbose_name_plural = "Review Cashback Settings"
+
+
+class ReferralCashback(models.Model):
+    business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name="ReferralCashback")
+    referral_cashback_enabled = models.BooleanField(default=False, verbose_name="Referral Cashback Enabled")
+    referral_amount_cashback_percent = models.IntegerField(
+        choices=[(i, f'{i}%') for i in range(1, 21)], default=1, verbose_name="Referral Amount Cashback %"
+    )
+    referral_amount_cashback_fixed = models.IntegerField(
+        choices=[(i, f'${i}') for i in range(1, 2001)], default=1, verbose_name="Referral Amount Cashback Fixed"
+    )
+    referral_cashback_return_refund_period = models.IntegerField(
+        choices=[(i, f'{i} days') for i in range(1, 61)], default=1, verbose_name="Referral Cashback Return and Refund Period"
+    )
+    referral_cashback_expiry = models.CharField(
+        max_length=10, choices=[('3 months', '3 months'), ('6 months', '6 months'), ('9 months', '9 months'), ('12 months', '12 months')],
+        default='3 months', verbose_name="Referral Cashback Expiry"
+    )
+
+    def __str__(self):
+        return f"Referral Cashback Settings - {self.referral_amount_cashback_percent}%"
+
+    class Meta:
+        verbose_name = "Referral Cashback Setting"
+        verbose_name_plural = "Referral Cashback Settings"
+
 
 # Employee Model
 class Employee(models.Model):
@@ -145,7 +200,6 @@ class CommingsoonLogin(models.Model):
     class Meta:
         verbose_name = "CommingsoonLogin"
         verbose_name_plural = "CommingsoonLogin"  # Plural Form
-
 
 
 

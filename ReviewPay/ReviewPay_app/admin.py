@@ -6,6 +6,8 @@ from django.utils.html import mark_safe
 from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import BusinessState, ProductImage, Barcode, UserDetail
 from .models import Feedback, BusinessVerifications,CommingsoonLogin
+from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback
+from .models import ReferralCashback,ReferralCashback
 #BusinessImage, BusinessVideo
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -27,13 +29,16 @@ class CategoryUsersAdmin(UserAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
-
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }   
 
     delete_option.short_description = 'Delete'  # Column header name
-
+ 
 # Register the Businessdetail model with its own admin class
 class BusinessdetailAdmin(admin.ModelAdmin):
-    list_display = ('business', 'business_name', 'category', 'sub_category', 'abn_number','businessLogo','delete_option')
+    list_display = ('business', 'business_name', 'category', 'sub_category', 'abn_number','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):
@@ -42,7 +47,23 @@ class BusinessdetailAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+class BusinessLogoAdmin(admin.ModelAdmin):
+    list_display = ('business', 'image', 'delete_option')
 
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
 
 # Register the Employee model with its own admin class
 class EmployeeAdmin(admin.ModelAdmin):
@@ -55,6 +76,10 @@ class EmployeeAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
+    class Media:
+        css = {
+            'all': ('css/custom.css',)  # Ensure correct static path
+        }
 
 # Register the Products model with its own admin class
 class ProductAdmin(admin.ModelAdmin):
@@ -67,6 +92,11 @@ class ProductAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
+         
+    class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
@@ -79,6 +109,13 @@ class ProductImageAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+
+
 @admin.register(Barcode)
 class BarcodeAdmin(admin.ModelAdmin):
     list_display = ('product', 'barcode_value', 'delete_option')
@@ -90,9 +127,13 @@ class BarcodeAdmin(admin.ModelAdmin):
             delete_url
         )
 
+    class Media:
+        css = {
+            'all': ('css/custom.css',)  # Ensure correct static path
+        }
 @admin.register(BusinessVerifications)
 class BusinessVerificationsAdmin(admin.ModelAdmin):
-    list_display = ('business', 'ACN', 'delete_option')
+    list_display = ('business', 'ACN', 'business_web','fullname_director_1' , 'fullname_director_2', 'admin_phone_number', 'business_phone_number','facebook_link' , 'instra_link', 'admin_email','client_email' , 'openning_hours', 'government_issue_document', 'business_name_evidence','company_extract_issue' ,'delete_option')
 
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
@@ -100,6 +141,11 @@ class BusinessVerificationsAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
+                   
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
 
 class UserDetailAdmin(admin.ModelAdmin):
     list_display = ('business', 'first_name', 'last_name', 'gender','date_of_birth','profile_image','delete_option')
@@ -111,7 +157,10 @@ class UserDetailAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
-
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = ('id', 'business', 'issue_category', 'issue_description','urgency_level')
 
@@ -122,6 +171,10 @@ class FeedbackAdmin(admin.ModelAdmin):
             '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
             delete_url
         )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
 
 class BusinessStateAdmin(admin.ModelAdmin):
     list_display = (
@@ -185,6 +238,93 @@ class CommingsoonLoginAdmin(admin.ModelAdmin):
             css = {
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
+
+class BusinessVideoAdmin(admin.ModelAdmin):
+    list_display = ('id','business', 'video','delete_option')
+
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+
+        delete_option.allow_tags = True
+        delete_option.short_description = "Delete"
+
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+class BusinessImageAdmin(admin.ModelAdmin):
+    list_display = ('id','business', 'image','delete_option')
+
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+
+        delete_option.allow_tags = True
+        delete_option.short_description = "Delete"
+
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+class ReviewCashbackAdmin(admin.ModelAdmin):
+    list_display = (
+                    'id','business', 'review_amount_cashback_percent',
+                    'review_amount_cashback_fixed','review_cashback_return_refund_period',
+                    'review_cashback_expiry','delete_option'
+                    )
+
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+
+        delete_option.allow_tags = True
+        delete_option.short_description = "Delete"
+
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+class ReferralCashbackAdmin(admin.ModelAdmin):
+    list_display = (
+                    'id','business', 'referral_cashback_enabled', 'referral_amount_cashback_percent',
+                    'referral_amount_cashback_fixed','referral_cashback_return_refund_period',
+                    'referral_cashback_expiry','delete_option'
+                    )
+
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+
+        delete_option.allow_tags = True
+        delete_option.short_description = "Delete"
+
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+
+admin.site.register(ReferralCashback,ReferralCashbackAdmin)
+admin.site.register(ReviewCashback,ReviewCashbackAdmin)
+admin.site.register(BusinessImage,BusinessImageAdmin)
+admin.site.register(BusinessVideo,BusinessVideoAdmin)
+admin.site.register(BusinessLogo,BusinessLogoAdmin)
 admin.site.register(CommingsoonLogin, CommingsoonLoginAdmin)
 admin.site.register(BusinessState, BusinessStateAdmin)
 admin.site.register(Feedback, FeedbackAdmin)

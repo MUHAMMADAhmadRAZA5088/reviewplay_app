@@ -31,7 +31,8 @@ from django.contrib.auth.models import User
 from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import UserDetail, Feedback, Barcode, ProductImage
 from .models import BusinessVerifications,CommingsoonLogin
-
+from .models import BusinessLogo, BusinessVideo, BusinessImage
+from .models import ReviewCashback,ReferralCashback
 User = get_user_model()  # Get the custom user model
 
 
@@ -50,10 +51,6 @@ def businessImages(user, businessImages):
         UploadedImages.objects.create(business = user,business_images = business_images)
 
 # Restful signup api
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import CategoryUsers
-
 @csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
 def api_signup(request):
     if request.method == 'POST':
@@ -164,21 +161,15 @@ class ResetPasswordView(APIView):
 def create_or_update_business_detail(request):
     user = request.user
     try:
-        # Parse the incoming JSON data
         business_data = request.POST
-        # Check if required data is present
+
         if not business_data:
             return JsonResponse({'error': 'Invalid data.'}, status=400)
 
-        business_logo = request.FILES.get("businessLogo")
-        file_extension = os.path.splitext(business_logo.name)[1]  # Get file extension (e.g., .jpg, .png)
-        new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
-        business_logo.name = new_file_name  # Assign the new name
-
+        # Ensure `Businessdetail` instance is assigned
         business_detail, created = Businessdetail.objects.update_or_create(
-            business=user,  # Check by the `business` field (OneToOne relation)
+            business=user,  # Check by `business` field (OneToOne relation)
             defaults={
-                'businessLogo': business_logo,
                 'category': business_data.get("category"),
                 'sub_category': business_data.get("subCategory"),
                 'abn_number': business_data.get("abnNumber"),
@@ -187,10 +178,21 @@ def create_or_update_business_detail(request):
             }
         )
 
-        if created:
-            message = 'Business data added successfully.'
-        else:
-            message = 'Business data updated successfully.'
+        # Get multiple images
+        business_logos = request.FILES.getlist("businessLogo")
+        
+        for business_logo in business_logos:
+            file_extension = os.path.splitext(business_logo.name)[1]  
+            new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  
+            business_logo.name = new_file_name  
+
+            # Correctly link to `Businessdetail` instance
+            BusinessLogo.objects.create(business=business_detail, image=business_logo)
+        
+        ReviewCashback.objects.update_or_create(business=business_detail)
+        ReferralCashback.objects.update_or_create(business=business_detail)
+
+        message = 'Business data added successfully.' if created else 'Business data updated successfully.'
 
         return JsonResponse({'message': message}, status=200)
 
@@ -198,7 +200,6 @@ def create_or_update_business_detail(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -397,8 +398,6 @@ def commingsoon(request):
         email = request.POST.get('email')
         phone_number = request.POST.get('phone_number')
 
-
-
         # Validation for required fields
         if not name or not email or not phone_number:
             return JsonResponse({'error': 'Username, email, and password are required'}, status=400)
@@ -417,3 +416,132 @@ def commingsoon(request):
       
     else:
         return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_business_video_and_image(request):
+    user = request.user
+
+    try:
+        # Ensure business detail exists for the user
+        business_detail = Businessdetail.objects.filter(business=user).first()
+        if not business_detail:
+            return JsonResponse({'error': 'Business detail not found for this user.'}, status=404)
+
+        # Get multiple videos from request
+        videos = request.FILES.getlist('video')
+        images = request.FILES.getlist('image')
+
+        if not videos:
+            return JsonResponse({'error': 'No videos uploaded.'}, status=400)
+
+        if not images:
+            return JsonResponse({'error': 'No images uploaded.'}, status=400)
+
+        for video in videos:
+            # Generate unique filename
+            file_extension = os.path.splitext(video.name)[1]  
+            new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  
+            video.name = new_file_name  
+
+            # Save to database
+            business_video = BusinessVideo.objects.create(business=business_detail, video=video)
+          
+        for image in images:
+            # Generate unique filename
+            file_extension = os.path.splitext(video.name)[1]  
+            new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  
+            video.name = new_file_name  
+
+            # Save to database
+            business_images = BusinessImage.objects.create(business=business_detail, image=image)
+        return Response({'message': 'Videos and images uploaded successfully.'}, status=201)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_review_cashback(request):
+    user = request.user
+
+    try:
+        # Get the business instance
+        business = Businessdetail.objects.get(business=user)
+        
+        # Get data from the request
+        review_amount_cashback_percent = request.data.get("review_amount_cashback_percent")
+        review_amount_cashback_fixed = request.data.get("review_amount_cashback_fixed")
+        review_cashback_return_refund_period = request.data.get("review_cashback_return_refund_period")
+        review_cashback_expiry = request.data.get("review_cashback_expiry")
+
+        # Create or update the ReviewCashback record
+        review_cashback, created = ReviewCashback.objects.update_or_create(
+            business=business,  # linking to the business
+            defaults={
+                'review_amount_cashback_percent': review_amount_cashback_percent,
+                'review_amount_cashback_fixed': review_amount_cashback_fixed,
+                'review_cashback_return_refund_period': review_cashback_return_refund_period,
+                'review_cashback_expiry': review_cashback_expiry
+            }
+        )
+
+        if created:
+            message = 'Review Cashback Settings created successfully.'
+        else:
+            message = 'Review Cashback Settings updated successfully.'
+
+        return JsonResponse({'message': message}, status=200)
+
+    except Businessdetail.DoesNotExist:
+        return JsonResponse({'error': 'Business not found.'}, status=404)
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_referral_cashback(request):
+    user = request.user
+
+    try:
+        # Get the business instance
+        business = Businessdetail.objects.get(business=user)
+
+        # Get data from the request
+        referral_cashback_enabled = request.data.get("referral_cashback_enabled")
+        referral_amount_cashback_percent = request.data.get("referral_amount_cashback_percent")
+        referral_amount_cashback_fixed = request.data.get("referral_amount_cashback_fixed")
+        referral_cashback_return_refund_period = request.data.get("referral_cashback_return_refund_period")
+        referral_cashback_expiry = request.data.get("referral_cashback_expiry")
+
+        # Create or update the ReferralCashback record
+        referral_cashback, created = ReferralCashback.objects.update_or_create(
+            business=business,  # linking to the business
+            defaults={
+                'referral_cashback_enabled': referral_cashback_enabled,
+                'referral_amount_cashback_percent': referral_amount_cashback_percent,
+                'referral_amount_cashback_fixed': referral_amount_cashback_fixed,
+                'referral_cashback_return_refund_period': referral_cashback_return_refund_period,
+                'referral_cashback_expiry': referral_cashback_expiry
+            }
+        )
+
+        if created:
+            message = 'Referral Cashback Settings created successfully.'
+        else:
+            message = 'Referral Cashback Settings updated successfully.'
+
+        return JsonResponse({'message': message}, status=200)
+
+    except Businessdetail.DoesNotExist:
+        return JsonResponse({'error': 'Business not found.'}, status=404)
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+

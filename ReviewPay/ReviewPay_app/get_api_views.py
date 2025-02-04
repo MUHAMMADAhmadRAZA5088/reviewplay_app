@@ -25,7 +25,7 @@ from django.utils import timezone
 from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState
-
+from .models import BusinessImage,BusinessLogo,BusinessVideo
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -63,6 +63,10 @@ def get_business_detail(request):
     user = request.user
     try :
         business_detail = Businessdetail.objects.get(business=user)
+        videos = business_detail.business_video.all()
+        logos = business_detail.business_logo.all() 
+        images = business_detail.business_image.all()
+
     except:
         return JsonResponse({'error':'data is not find'}, status=404)
 
@@ -75,9 +79,20 @@ def get_business_detail(request):
                 'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
                 'category': business_detail.category,
                 'sub_category': business_detail.sub_category,
-                'businessLogo': 'http://192.168.100.14:8000'+business_detail.businessLogo.url if business_detail.businessLogo else None,  # Check if profile_image exists
-                'email' : business_detail.business.email,
-            }
+                'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
+                'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
+                'images': ['https://superadmin.reviewpay.com.au' + image.image.url for image in images],
+                "review_cashbacks": list(business_detail.ReviewCashback.all().values(
+                                        "id", "review_amount_cashback_percent", "review_amount_cashback_fixed",
+                                        "review_cashback_return_refund_period", "review_cashback_expiry"
+                )),
+                # Referral Cashback
+                "referral_cashbacks": list(business_detail.ReferralCashback.all().values(
+                                        "id", "referral_cashback_enabled", "referral_amount_cashback_percent",
+                                        "referral_amount_cashback_fixed", "referral_cashback_return_refund_period",
+                                        "referral_cashback_expiry"
+                )),
+                }
 
         # Return the data as JSON
         return JsonResponse(data, safe=False, status=200)
