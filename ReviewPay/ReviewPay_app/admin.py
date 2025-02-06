@@ -7,7 +7,7 @@ from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import BusinessState, ProductImage, Barcode, UserDetail
 from .models import Feedback, BusinessVerifications,CommingsoonLogin
 from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback
-from .models import ReferralCashback,ReferralCashback
+from .models import ReferralCashback,ReferralCashback, UserCashBack
 #BusinessImage, BusinessVideo
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -26,7 +26,7 @@ class CategoryUsersAdmin(UserAdmin):
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
         class Media:
@@ -38,13 +38,13 @@ class CategoryUsersAdmin(UserAdmin):
  
 # Register the Businessdetail model with its own admin class
 class BusinessdetailAdmin(admin.ModelAdmin):
-    list_display = ('business', 'business_name', 'category', 'sub_category', 'abn_number','delete_option')
+    list_display = ('id','business', 'business_name', 'category', 'sub_category', 'abn_number','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
         class Media:
@@ -52,12 +52,12 @@ class BusinessdetailAdmin(admin.ModelAdmin):
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
 class BusinessLogoAdmin(admin.ModelAdmin):
-    list_display = ('business', 'image', 'delete_option')
+    list_display = ('id','business', 'image', 'delete_option')
 
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
         class Media:
@@ -67,13 +67,13 @@ class BusinessLogoAdmin(admin.ModelAdmin):
 
 # Register the Employee model with its own admin class
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('business', 'employee_name', 'identification_number', 'designation','working_since', 'employee_email_address','delete_option')
+    list_display = ('id','business', 'employee_name', 'identification_number', 'designation','working_since', 'employee_email_address','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
     class Media:
@@ -83,13 +83,13 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 # Register the Products model with its own admin class
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('business', 'product_name', 'product_description', 'product_price','delete_option')
+    list_display = ('id','business', 'product_name', 'product_description', 'product_price','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
          
@@ -100,13 +100,13 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ('product', 'image', 'delete_option')
+    list_display = ('id','product', 'image', 'delete_option')
 
     def delete_option(self, obj):
 
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
         class Media:
@@ -118,12 +118,12 @@ class ProductImageAdmin(admin.ModelAdmin):
 
 @admin.register(Barcode)
 class BarcodeAdmin(admin.ModelAdmin):
-    list_display = ('product', 'barcode_value', 'delete_option')
+    list_display = ('id','product', 'barcode_value', 'delete_option')
 
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
 
@@ -133,12 +133,12 @@ class BarcodeAdmin(admin.ModelAdmin):
         }
 @admin.register(BusinessVerifications)
 class BusinessVerificationsAdmin(admin.ModelAdmin):
-    list_display = ('business', 'ACN', 'business_web','fullname_director_1' , 'fullname_director_2', 'admin_phone_number', 'business_phone_number','facebook_link' , 'instra_link', 'admin_email','client_email' , 'openning_hours', 'government_issue_document', 'business_name_evidence','company_extract_issue' ,'delete_option')
+    list_display = ('id','business', 'ACN', 'business_web','fullname_director_1' , 'fullname_director_2', 'admin_phone_number', 'business_phone_number','facebook_link' , 'instra_link', 'admin_email','client_email' , 'openning_hours', 'government_issue_document', 'business_name_evidence','company_extract_issue' ,'delete_option')
 
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
                    
@@ -148,13 +148,13 @@ class BusinessVerificationsAdmin(admin.ModelAdmin):
             }
 
 class UserDetailAdmin(admin.ModelAdmin):
-    list_display = ('business', 'first_name', 'last_name', 'gender','date_of_birth','profile_image','delete_option')
+    list_display = ('id','business', 'first_name', 'last_name', 'gender','date_of_birth','profile_image','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
         class Media:
@@ -168,7 +168,7 @@ class FeedbackAdmin(admin.ModelAdmin):
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<a href="{}" style="padding: 5px 10px; color: white; background-color: red; border: none; border-radius: 3px; text-decoration: none;">Delete</a>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
         class Media:
@@ -178,6 +178,7 @@ class FeedbackAdmin(admin.ModelAdmin):
 
 class BusinessStateAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'product_name',  # Product name
         'quality',       # Editable field
         'quality_progress_bar', 
@@ -245,7 +246,7 @@ class BusinessVideoAdmin(admin.ModelAdmin):
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
 
@@ -263,7 +264,7 @@ class BusinessImageAdmin(admin.ModelAdmin):
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
 
@@ -285,7 +286,7 @@ class ReviewCashbackAdmin(admin.ModelAdmin):
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
         return format_html(
-            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
             delete_url
         )
 
@@ -319,7 +320,27 @@ class ReferralCashbackAdmin(admin.ModelAdmin):
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
 
+class UserCashBackAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'user', 'business_id', 'invoice_price', 'amount', 'created_date', 'delete_option'
+    )
 
+
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+            '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+
+        delete_option.allow_tags = True
+        delete_option.short_description = "Delete"
+
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+admin.site.register(UserCashBack,UserCashBackAdmin)
 admin.site.register(ReferralCashback,ReferralCashbackAdmin)
 admin.site.register(ReviewCashback,ReviewCashbackAdmin)
 admin.site.register(BusinessImage,BusinessImageAdmin)

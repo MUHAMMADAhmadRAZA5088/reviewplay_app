@@ -201,6 +201,16 @@ class CommingsoonLogin(models.Model):
         verbose_name = "CommingsoonLogin"
         verbose_name_plural = "CommingsoonLogin"  # Plural Form
 
+class UserCashBack(models.Model):
+    user =  models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name="usercashback")
+    business_id = models.IntegerField()
+    invoice_price = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Invoice {self.id} - User {self.user_id}"
+
 
 
 

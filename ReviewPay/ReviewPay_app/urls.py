@@ -6,6 +6,8 @@ from . import views,api_views,get_api_views,delete_view,google_view
 
 urlpatterns = [
 
+    path('reviewpayrole_api/get_cashback/',get_api_views.get_cashback, name='get_cashback'),
+    path('reviewpayrole_api/cashback/', api_views.cashback, name='cashback'),
     # cashback api
     path('reviewpayrole_api/create_review_cashback/', api_views.create_review_cashback, name='create_review_cashback'),
     path('reviewpayrole_api/create_referral_cashback/', api_views.create_referral_cashback, name='create_referral_cashback'),

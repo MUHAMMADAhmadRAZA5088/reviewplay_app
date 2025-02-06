@@ -32,7 +32,7 @@ from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import UserDetail, Feedback, Barcode, ProductImage
 from .models import BusinessVerifications,CommingsoonLogin
 from .models import BusinessLogo, BusinessVideo, BusinessImage
-from .models import ReviewCashback,ReferralCashback
+from .models import ReviewCashback,ReferralCashback, UserCashBack
 User = get_user_model()  # Get the custom user model
 
 
@@ -545,3 +545,33 @@ def create_referral_cashback(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def cashback(request):
+    try:
+        user = request.user
+    
+        data = json.loads(request.body)
+        try:
+            user_detail = UserDetail.objects.get(business=user)
+        except:
+            return JsonResponse({'error': 'User Detail not found.'}, status=404)
+        business_detail = Businessdetail.objects.get(id=data.get('business_id'))
+        cashback = business_detail.ReviewCashback.first()
+        if cashback:
+            cashback = cashback.review_amount_cashback_percent
+
+        invoice_price = data.get('price')
+        amount = (invoice_price/100) * cashback
+        UserCashBack.objects.create(
+            user=user_detail,
+            business_id=business_detail.id,
+            invoice_price=float(invoice_price),
+            amount=float(amount)
+        )
+        return JsonResponse({'message': "invoce cashback created"}, status=200)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

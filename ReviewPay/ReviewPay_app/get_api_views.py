@@ -25,7 +25,7 @@ from django.utils import timezone
 from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState
-from .models import BusinessImage,BusinessLogo,BusinessVideo
+from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -265,3 +265,39 @@ def get_business_state(request):
                          'easy_to_use' : business_state.easy_to_use,
                          'durability' : business_state.durability,
                         }, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_cashback(request):
+    user = request.user
+    try:
+        try:
+            user_detail = UserDetail.objects.get(business=user)
+        except:
+            return JsonResponse({'error':'user_detail not fullfill'}, status=404)
+        if user_detail:
+            invoice = 0
+            cashback_price = 0
+            user_cashback = user_detail.usercashback.all()
+            data = []
+            for cashback in user_cashback:
+            
+                data.append({
+                    'id': cashback.id,
+                    'user_id': cashback.user.id,
+                    'business_id' : cashback.business_id,
+                    'invoice price' : cashback.invoice_price,
+                    'amount' : cashback.amount,
+                    'created date' : cashback.created_date,
+
+                })
+                
+                invoice += cashback.invoice_price
+                cashback_price += cashback.amount
+            whole_data = {'invoice': invoice, 'cashback': cashback_price, 'total invoice': data}
+            return JsonResponse(whole_data, safe=False, status=200)
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
