@@ -13,13 +13,36 @@ class CategoryUsers(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES,default="admin user")
 
 
+class OrderTracking(models.Model):
+    marchant_api = models.CharField(max_length=100)
+    adv_sub = models.CharField(max_length=100)  # Order ID
+    adv_sub2 = models.CharField(max_length=100, blank=True, null=True)  # Product Category
+    adv_sub3 = models.PositiveIntegerField(blank=True, null=True)  # Product Quantity
+    adv_sub4 = models.CharField(max_length=100, blank=True, null=True)  # Product ID/SKU ID
+    adv_sub5 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)  # Order Total Amount Paid
+    transaction_id = models.CharField(max_length=30 )  # Unique Transaction ID
+    amount = models.DecimalField(max_digits=10, decimal_places=2)  # Subtotal
+    user_id = models.CharField(max_length=100)  # ReviewPay User ID
+    status = models.CharField(max_length=20, default="Pending")  # Order Status
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Order {self.adv_sub} - {self.status}"
+
+
 class Businessdetail(models.Model):
+    marchant_api_key = models.CharField(max_length=100, unique=True, blank=True)  
     business = models.OneToOneField(CategoryUsers, on_delete=models.CASCADE, related_name="businesses")
     category = models.CharField(max_length=100, null=True, blank=True)
     sub_category = models.CharField(max_length=100, null=True, blank=True)
     abn_number = models.CharField(max_length=20, null=True, blank=True)
     business_name = models.CharField(max_length=100, null=True, blank=True)
     business_address = models.TextField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.marchant_api_key:  # Agar API key nahi hai to generate karo
+            self.marchant_api_key = secrets.token_urlsafe(32)  # 32-character long secure key
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Business Detail"

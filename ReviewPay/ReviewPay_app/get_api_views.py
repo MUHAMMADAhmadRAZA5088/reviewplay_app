@@ -74,6 +74,7 @@ def get_business_detail(request):
         data = {
                 'id': business_detail.id,
                 'business_name': business_detail.business_name,
+                'marchant api' : business_detail.marchant_api_key,
                 'email' : business_detail.business.email,
                 'business_address' : business_detail.business_address,
                 'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business

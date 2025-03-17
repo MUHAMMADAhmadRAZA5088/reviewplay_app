@@ -3,6 +3,7 @@ import threading
 import time
 import base64
 import os
+from decimal import Decimal
 from uuid import uuid4
 
 from django.core.files.base import ContentFile
@@ -31,7 +32,7 @@ from django.contrib.auth.models import User
 from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import UserDetail, Feedback, Barcode, ProductImage
 from .models import BusinessVerifications,CommingsoonLogin
-from .models import BusinessLogo, BusinessVideo, BusinessImage
+from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking
 from .models import ReviewCashback,ReferralCashback, UserCashBack
 User = get_user_model()  # Get the custom user model
 
@@ -575,3 +576,63 @@ def cashback(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+def api_ordertracking(request):
+    if request.method == 'POST':
+        try:
+            marchant_api = request.headers.get("X-API-KEY")
+            data = json.loads(request.body)
+            try:
+                business_detail = Businessdetail.objects.get(marchant_api_key = marchant_api)
+            except:
+                return JsonResponse({'error': 'marchant api key not found.'}, status=404)
+            order = OrderTracking.objects.create(
+                    marchant_api = marchant_api,
+                    adv_sub = data.get("adv_sub"),
+                    adv_sub2 = data.get("adv_sub2"),
+                    adv_sub3 = data.get("adv_sub3"),
+                    adv_sub4 = data.get("adv_sub4"),
+                    adv_sub5 = data.get("adv_sub5"),
+                    transaction_id = data.get("transaction_id"),
+                    amount = data.get("amount"),
+                    user_id = business_detail.id,
+                    status = "Pending"
+                )
+
+            return JsonResponse({"message": "Order received successfully", "order_id": order.id}, status=200)
+
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    else :
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+def api_validation(request):
+    if request.method == 'POST':
+        marchant_api = request.headers.get("X-API-KEY")
+        data = json.loads(request.body)
+        
+        try:
+            business_detail = Businessdetail.objects.get(marchant_api_key = marchant_api)
+        except:
+            return JsonResponse({'error': 'marchant api key not found.'}, status=404)
+        orders = OrderTracking.objects.filter(transaction_id = 'AR6666')  
+        pending_amount = 0
+
+        for order in orders:
+            pending_amount = pending_amount + orders[0].amount
+     
+        if Decimal(data["amount"]) == pending_amount:
+          
+            for order in orders:
+                order.status = data["status"]
+                order.save()
+            return JsonResponse({'massage': 'The order has been updated to approved status.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid amount'}, status=400)
+        
+        

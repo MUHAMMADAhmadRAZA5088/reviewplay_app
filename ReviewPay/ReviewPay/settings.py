@@ -89,6 +89,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ReviewPay.wsgi.application'
 
+# paypal credential
+PAYPAL_CLIENT_ID = "AWVo9-034cQS1XkeL9Y08W5kLMNTVjd6l2xV4UcCjLqyNJYH9UIUSsZL6hMS4m3s3fBF2SwzzTZrmOiq"
+PAYPAL_SECRET = "EIFQCFSF-A5kjlh-iPKo_5gCDuUzNxVOT1JJzwXjo85C2YE0oVv2hUZm0cHvszOjPMOzJpi5TMKXuRhr"
+PAYPAL_API_URL = "https://api-m.sandbox.paypal.com"  # LIVE ke liye 'sandbox' hatao
+
+
 # Database
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -97,7 +103,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "reviewpaydb",
         "USER": "admin",
-        "PASSWORD": "spiderhunts5088",
+        "PASSWORD": "spiderhunts031$",
         "HOST": "reviewpaydb.c16ag80quyf7.ap-southeast-2.rds.amazonaws.com",
         "PORT": "3306",
     }

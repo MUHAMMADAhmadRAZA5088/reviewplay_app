@@ -6,11 +6,24 @@ from . import views,api_views,get_api_views,delete_view,google_view
 
 urlpatterns = [
 
+
+    # Paypal setting
+    path('paypal/token/', views.get_paypal_token, name='get_paypal_token'),
+    path('paypal/create-payment/', views.create_payment, name='create_payment'),
+    path('paypal/capture-payment/', views.capture_payment, name='capture_payment'),
+
+    # marchant api
+    path('reviewpayrole_api/order_validation', api_views.api_validation, name='order_validation'),
+    path('reviewpayrole_api/ordertracking',api_views.api_ordertracking, name='order_tracking'),
+
+    # cashback api
     path('reviewpayrole_api/get_cashback/',get_api_views.get_cashback, name='get_cashback'),
     path('reviewpayrole_api/cashback/', api_views.cashback, name='cashback'),
+
     # cashback api
     path('reviewpayrole_api/create_review_cashback/', api_views.create_review_cashback, name='create_review_cashback'),
     path('reviewpayrole_api/create_referral_cashback/', api_views.create_referral_cashback, name='create_referral_cashback'),
+
     # commimg soon api
     path('reviewpayrole_api/business_video_images', api_views.upload_business_video_and_image,name='business_video_images'),
     path('reviewpayrole_api/commingsoon',api_views.commingsoon, name='comming_soon_user'),
