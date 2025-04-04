@@ -38,8 +38,14 @@ class CategoryUsersAdmin(UserAdmin):
  
 # Register the Businessdetail model with its own admin class
 class BusinessdetailAdmin(admin.ModelAdmin):
-    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number','delete_option')
+    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number','display_qr_code' ,'delete_option')
 
+    def display_qr_code(self, obj):
+        if obj.qr_code:
+            return format_html(f'<img src="/{obj.qr_code}" width="100"/>')
+        return "No QR Code"
+
+    display_qr_code.short_description = "QR Code"
         # Custom column for delete
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])

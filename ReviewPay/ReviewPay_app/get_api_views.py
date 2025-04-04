@@ -3,14 +3,19 @@ import threading
 import time
 import base64
 import os
+import qrcode
 import uuid
 
+from django.http import HttpResponse
+import secrets
+from io import BytesIO
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.contrib.auth.tokens import default_token_generator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, get_user_model
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -60,6 +65,7 @@ def get_user_detail(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_business_detail(request):
+
     user = request.user
     try :
         business_detail = Businessdetail.objects.get(business=user)
@@ -103,7 +109,60 @@ def get_business_detail(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-        
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_business_detail_all(request):
+    
+    user = request.user
+    business_details = Businessdetail.objects.all()
+    all_data = []
+    try:
+        for business_detail in business_details:
+            try :
+                videos = business_detail.business_video.all()
+                logos = business_detail.business_logo.all() 
+                images = business_detail.business_image.all()
+
+            except:
+                return JsonResponse({'error':'data is not find'}, status=404)
+
+            try:
+                data = {
+                        'id': business_detail.id,
+                        'business_name': business_detail.business_name,
+                        'marchant api' : business_detail.marchant_api_key,
+                        'email' : business_detail.business.email,
+                        'business_address' : business_detail.business_address,
+                        'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
+                        'category': business_detail.category,
+                        'sub_category': business_detail.sub_category,
+                        'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
+                        'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
+                        'images': ['https://superadmin.reviewpay.com.au' + image.image.url for image in images],
+                        "review_cashbacks": list(business_detail.ReviewCashback.all().values(
+                                                "id", "review_amount_cashback_percent", "review_amount_cashback_fixed",
+                                                "review_cashback_return_refund_period", "review_cashback_expiry"
+                        )),
+                        # Referral Cashback
+                        "referral_cashbacks": list(business_detail.ReferralCashback.all().values(
+                                                "id", "referral_cashback_enabled", "referral_amount_cashback_percent",
+                                                "referral_amount_cashback_fixed", "referral_cashback_return_refund_period",
+                                                "referral_cashback_expiry"
+                        )),
+                        }
+                all_data.append(data)
+            except:
+                return JsonResponse({'error':'data is not find'}, status=404)
+                # Return the data as JSON
+
+        return JsonResponse(all_data, safe=False, status=200)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_employee_detail(request, slug=None):
@@ -302,3 +361,50 @@ def get_cashback(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def generate_qr_api(request, Business_id):
+    # Data to be encoded in the QR code
+    # import pdb;pdb.set_trace()
+    data = f"http://127.0.0.1:8000/reviewpayrole_api/qr_scan/?user_id={request.user.id}&Business_id={Business_id}&status=pending"
+
+    # Create the QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    # Create image from QR code
+    img = qr.make_image(fill="black", back_color="white")
+
+    # Save image to a BytesIO object to send in the response
+    buffer = BytesIO()
+    img.save(buffer)
+    buffer.seek(0)
+
+    # Return the image as HTTP response
+    return HttpResponse(buffer, content_type="image/png")
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Anyone can scan the QR
+def qr_scan_api(request):
+    user_id = request.GET.get("user_id")
+    business_id = request.GET.get("business_id")
+    scan_url = request.build_absolute_uri()
+    
+    # Store scan in database
+    if user_id and business_id:
+        QRScan.objects.create(
+            user_id=user_id,
+            business_id=business_id,
+            scan_url=scan_url,
+            status="pending"
+        )
+        return JsonResponse({"message": "Scan recorded", "status": "pending"}, status=status.HTTP_201_CREATED)
+    
+    return JsonResponse({"error": "Invalid request"}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,4 +1,6 @@
 import requests
+import secrets
+
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -128,3 +130,14 @@ def capture_payment(request):
 # def home(request):
 #     return render(request, 'home.html')
 
+@api_view(['POST'])
+def my_webhook(request):
+    try:
+        data = request.data  # Webhook se aane wala JSON data
+        print("Received Webhook Data:", data)
+
+        # Aap yahan apni custom processing kar sakte hain
+        return Response({"message": "Webhook received successfully"}, status=200)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
