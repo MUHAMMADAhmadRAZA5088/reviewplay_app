@@ -38,6 +38,7 @@ class Businessdetail(models.Model):
     abn_number = models.CharField(max_length=20, null=True, blank=True)
     business_name = models.CharField(max_length=100, null=True, blank=True)
     business_address = models.TextField(null=True, blank=True)
+    business_url = models.URLField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.marchant_api_key:  # Agar API key nahi hai to generate karo

@@ -30,7 +30,7 @@ from django.utils import timezone
 from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState
-from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack
+from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -365,10 +365,13 @@ def get_cashback(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def generate_qr_api(request, Business_id):
-    # Data to be encoded in the QR code
-    # import pdb;pdb.set_trace()
-    data = f"http://127.0.0.1:8000/reviewpayrole_api/qr_scan/?user_id={request.user.id}&Business_id={Business_id}&status=pending"
-
+    
+    try:
+        business_detail_instance = Businessdetail.objects.get(id=Business_id)
+    except:
+        return JsonResponse({'error':'business not found'}, status=404)
+    
+    data = f"http://127.0.0.1:8000/reviewpayrole_api/qr_scan/?user_id={request.user.id}&Business_id={Business_id}&url={business_detail_instance.business_url}&status=pending"
     # Create the QR code
     qr = qrcode.QRCode(
         version=1,
@@ -394,17 +397,26 @@ def generate_qr_api(request, Business_id):
 @permission_classes([AllowAny])  # Anyone can scan the QR
 def qr_scan_api(request):
     user_id = request.GET.get("user_id")
-    business_id = request.GET.get("business_id")
+    business_id = request.GET.get("Business_id")
+    status = request.GET.get("status")
+    url = request.GET.get("url")
     scan_url = request.build_absolute_uri()
-    
+
     # Store scan in database
     if user_id and business_id:
-        QRScan.objects.create(
+        scan_entry = QRScan.objects.create(
             user_id=user_id,
             business_id=business_id,
-            scan_url=scan_url,
-            status="pending"
+            scan_url=url,
+            status=status
         )
-        return JsonResponse({"message": "Scan recorded", "status": "pending"}, status=status.HTTP_201_CREATED)
+        return JsonResponse({
+            "message": "Scan recorded",
+            "status": "pending",
+            "scan_id": scan_entry.id,  
+            "business_id" : business_id,
+            "user_id" : user_id,
+            "website_url" : f"{url}?id={scan_entry.id}&user_id{user_id}&business_id={business_id}"
+        }, status=200)
     
-    return JsonResponse({"error": "Invalid request"}, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({"error": "Invalid request"}, status=400)

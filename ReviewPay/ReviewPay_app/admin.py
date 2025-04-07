@@ -7,7 +7,7 @@ from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import BusinessState, ProductImage, Barcode, UserDetail
 from .models import Feedback, BusinessVerifications,CommingsoonLogin
 from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback
-from .models import ReferralCashback,ReferralCashback, UserCashBack, OrderTracking
+from .models import ReferralCashback,ReferralCashback, UserCashBack, OrderTracking,QRScan
 #BusinessImage, BusinessVideo
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -38,14 +38,9 @@ class CategoryUsersAdmin(UserAdmin):
  
 # Register the Businessdetail model with its own admin class
 class BusinessdetailAdmin(admin.ModelAdmin):
-    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number','display_qr_code' ,'delete_option')
+    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number' ,'business_url','delete_option')
 
-    def display_qr_code(self, obj):
-        if obj.qr_code:
-            return format_html(f'<img src="/{obj.qr_code}" width="100"/>')
-        return "No QR Code"
-
-    display_qr_code.short_description = "QR Code"
+   
         # Custom column for delete
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
@@ -363,6 +358,20 @@ class OrderTrackingAdmin(admin.ModelAdmin):
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
 
+class QRScanAdmin(admin.ModelAdmin):
+    list_display = ('id','user_id','business_id','scan_url','status','scanned_at','delete_option')
+    # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+admin.site.register(QRScan,QRScanAdmin)
 admin.site.register(OrderTracking,OrderTrackingAdmin)
 admin.site.register(UserCashBack,UserCashBackAdmin)
 admin.site.register(ReferralCashback,ReferralCashbackAdmin)
