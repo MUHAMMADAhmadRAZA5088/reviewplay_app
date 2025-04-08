@@ -2,14 +2,16 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenRefreshView
-from . import views,api_views,get_api_views,delete_view,google_view
+from . import views, api_views, get_api_views, delete_view, google_view
 
 urlpatterns = [
     # QR Code
     path('reviewpayrole_api/generate_qr/<str:Business_id>/', get_api_views.generate_qr_api, name='generate_qr_api'),
     path('reviewpayrole_api/qr_scan/', get_api_views.qr_scan_api, name='qr_scan_api'),  # Scan API
+
     # webhook
     path('reviewpayrole_api/webhook/', views.my_webhook, name='webhook'),
+
     # Paypal setting
     path('paypal/token/', views.get_paypal_token, name='get_paypal_token'),
     path('paypal/create-payment/', views.create_payment, name='create_payment'),
@@ -31,15 +33,19 @@ urlpatterns = [
     path('reviewpayrole_api/business_video_images', api_views.upload_business_video_and_image,name='business_video_images'),
     path('reviewpayrole_api/commingsoon',api_views.commingsoon, name='comming_soon_user'),
     path('reviewpayrole_api/get_statistics',get_api_views.get_business_state, name='get_statistics'),
+    # feedback
     path('reviewpayrole_api/get_feedback/<int:slug>/', get_api_views.get_feedback, name='get_feedback'),
     path('reviewpayrole_api/get_feedback', get_api_views.get_feedback, name='get_feedback'),
     path('reviewpayrole_api/feedback', api_views.feedback, name='feedback'),
+    # employee_detail
     path('reviewpayrole_api/get_employee_detail/<int:slug>/',get_api_views.get_employee_detail, name="employee_detail"),
     path('reviewpayrole_api/get_employee_detail',get_api_views.get_employee_detail, name="employee_detail"),
+    # details
     path('reviewpayrole_api/get_user_detail', get_api_views.get_user_detail, name="get_user_detail"),
     path('reviewpayrole_api/get_business_detail', get_api_views.get_business_detail, name="get_business_detail"),
     path('reviewpayrole_api/get_business_detail/all/', get_api_views.get_business_detail_all, name="business_details_all"),
     path('reviewpayrole_api/user/user_detail', api_views.user_detail, name='user_detail'),
+    # product details
     path('reviewpayrole_api/business/products_detail', api_views.product, name='products_detals'),
     path('reviewpayrole_api/get_products',get_api_views.get_products, name="get_products"),
     path('reviewpayrole_api/get_products/<int:slug>/',get_api_views.get_products, name="get_products_with_id"),

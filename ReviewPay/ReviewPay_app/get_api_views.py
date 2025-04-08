@@ -119,6 +119,27 @@ def get_business_detail_all(request):
     all_data = []
     try:
         for business_detail in business_details:
+            try:
+                business_verification = BusinessVerifications.objects.get(business= business_detail.business) 
+                
+                verification = {
+                    'id': business_verification.id,
+                    'business_web': business_verification.business_web,
+                    'ACN' : business_verification.ACN,
+                    'fullname_director_1' : business_verification.fullname_director_1,
+                    'fullname_director_2' : business_verification.fullname_director_2,
+                    'admin_phone_number' : business_verification.admin_phone_number,
+                    'business_phone_number' : business_verification.business_phone_number,
+                    'facebook_link' : business_verification.facebook_link,
+                    'instagram_link' : business_verification.instra_link,
+                    'admin_email' : business_verification.admin_email,
+                    'client_email' : business_verification.client_email,
+                    'openning_hours' : business_verification.openning_hours,
+                }
+                
+            except:
+                verification = {}
+
             try :
                 videos = business_detail.business_video.all()
                 logos = business_detail.business_logo.all() 
@@ -137,6 +158,7 @@ def get_business_detail_all(request):
                         'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
                         'category': business_detail.category,
                         'sub_category': business_detail.sub_category,
+                        'business_verification': verification,
                         'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
                         'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
                         'images': ['https://superadmin.reviewpay.com.au' + image.image.url for image in images],
