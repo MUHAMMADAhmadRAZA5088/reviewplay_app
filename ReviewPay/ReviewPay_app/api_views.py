@@ -6,6 +6,7 @@ import os
 from decimal import Decimal
 from uuid import uuid4
 
+from datetime import date
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.contrib.auth.tokens import default_token_generator
@@ -33,7 +34,7 @@ from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import UserDetail, Feedback, Barcode, ProductImage
 from .models import BusinessVerifications,CommingsoonLogin
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking
-from .models import ReviewCashback,ReferralCashback, UserCashBack
+from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications
 User = get_user_model()  # Get the custom user model
 
 
@@ -49,7 +50,7 @@ def businessImages(user, businessImages):
             business_images = image_decode(businessimages)
         else:
             business_images = ''
-        UploadedImages.objects.create(business = user,business_images = business_images)
+        businessImages.objects.create(business = user,business_images = business_images)
 
 # Restful signup api
 @csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
@@ -82,6 +83,9 @@ def api_signup(request):
                     role=role
                 )
                 user.save()
+
+                if role == 'business':
+                    Notifications.objects.create(user_id=user)
                 return JsonResponse({'message': 'User added successfully'}, status=201)
             except Exception as e:
                 return JsonResponse({'error': 'Email already exists'}, status=400)
@@ -192,8 +196,15 @@ def create_or_update_business_detail(request):
         
         ReviewCashback.objects.update_or_create(business=business_detail)
         ReferralCashback.objects.update_or_create(business=business_detail)
-
+        
         message = 'Business data added successfully.' if created else 'Business data updated successfully.'
+        try:
+            notification = Notifications.objects.get(user_id=user)
+            notification.business_detail = 'success'
+            notification.business_detail_date = date.today()
+            notification.save()
+        except:
+            return JsonResponse({'message': 'notification error'}, status=400)
 
         return JsonResponse({'message': message}, status=200)
 
@@ -370,6 +381,14 @@ def business_verifications(request):
         else:
             message = 'Business verifications data updated successfully.'
 
+        try:
+            notification = Notifications.objects.get(user_id=user)
+            notification.business_verify = 'success'
+            notification.business_verify_date = date.today()
+            notification.save()
+        except:
+            return JsonResponse({'message': 'notification error'}, status=400)
+        
         return JsonResponse({'message': message}, status=200)
 
     except KeyError as e:
@@ -457,6 +476,13 @@ def upload_business_video_and_image(request):
 
             # Save to database
             business_images = BusinessImage.objects.create(business=business_detail, image=image)
+        try:
+            notification = Notifications.objects.get(user_id=user)
+            notification.product_image = 'success'
+            notification.product_image_date = date.today()
+            notification.save()
+        except:
+            return Response({'message': 'Notification Error'}, status=400)
         return Response({'message': 'Videos and images uploaded successfully.'}, status=201)
 
     except Exception as e:
@@ -636,3 +662,80 @@ def api_validation(request):
             return JsonResponse({'error': 'Invalid amount'}, status=400)
         
         
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def dissmise_notification(request):
+    if request.method == 'POST':
+        user = request.user
+        data = json.loads(request.body)
+        notification = Notifications.objects.get(user_id=user)
+        
+        try:
+            success_business = Businessdetail.objects.get(business=user)
+            
+            notification.business_detail = 'success'
+            notification.business_detail_date = date.today()
+            notification.save()
+         
+            image = success_business.business_image.all()
+            if image:
+                notification.product_image = 'success'
+                notification.product_image_date = date.today()
+                notification.save()
+            else:
+                image = ''
+        except:
+            success_business = ''
+            image = ''
+
+        try :
+            verify = BusinessVerifications.objects.get(business= user)
+            if verify:
+                notification.business_verify = 'success'
+                notification.business_verify_date = date.today()
+                notification.save()
+        except:
+            verify = ''
+
+        
+        try:
+            data["detail_business"]
+        except:
+            data["detail_business"] = None
+
+        try:
+            data["product_image"]
+        except:
+            data["product_image"] = None
+        
+        try:
+            data["business_verify"]
+        except:
+            data["business_verify"] = None
+
+        if data["detail_business"] == 'd' and success_business == '':
+            notification.business_detail = 'delay'
+            notification.business_detail_date = date.today()
+            notification.save()
+
+        if data["product_image"] == 'd' and image == '':
+            notification.product_image = 'delay'
+            notification.product_image_date = date.today()
+            notification.save()
+        
+        if data["business_verify"] == 'd' and verify == '':
+            
+            notification.business_verify = 'delay'
+            notification.business_verify_date = date.today()
+            notification.save()
+
+
+        return JsonResponse({'id': notification.id,
+                'business_detail':notification.business_detail,
+                'business_detail_date':notification.business_detail_date,
+                'product_image':notification.product_image,
+                'product_image_date':notification.product_image_date,
+                'business_verify':notification.business_verify,
+                'business_verify_date':notification.business_verify_date
+                }, safe=False, status=200)

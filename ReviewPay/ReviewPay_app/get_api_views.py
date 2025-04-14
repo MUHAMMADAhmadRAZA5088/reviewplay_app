@@ -6,6 +6,7 @@ import os
 import qrcode
 import uuid
 
+from datetime import date
 from django.http import HttpResponse
 import secrets
 from io import BytesIO
@@ -30,7 +31,7 @@ from django.utils import timezone
 from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState
-from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan
+from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -442,3 +443,83 @@ def qr_scan_api(request):
         }, status=200)
     
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def business_message_alert(request):
+    user = request.user
+    try:
+        try:
+            business_detail = Businessdetail.objects.get(business=user)
+            if business_detail:
+                business_detal = "Add Business detail successfully"
+            else:
+                business_detal = "Add Business detail failed"
+            images = business_detail.business_image.all()
+            if images:
+                product_img = "Add product images successfully"
+            else :
+                product_img = "Add product images failed"
+        except:
+            business_detal = "Add Business detail failed"
+            product_img = "Add product images failed"
+        
+        try:
+            business_verification = BusinessVerifications.objects.get(business= business_detail.business) 
+            if business_verification:
+                business_verify = "Business verification successfully"
+            else:
+                business_verify = "Business verification failed"
+        except:
+            business_verify = "Business verification failed"
+        
+        return JsonResponse({"Business Detail": business_detal, "product image" : product_img, "business verification" : business_verify }, safe=False, status=200)
+    
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def notification(request):
+    user = request.user
+    try:
+        notification = Notifications.objects.get(user_id=user)
+        current_date = date.today()
+        
+        if notification.business_detail_date:
+            total_day = (current_date - notification.business_detail_date).days
+            if total_day >= 3 and notification.business_detail == 'delay' :
+                notification.business_detail = 'pending'
+                notification.business_detail_date = date.today()
+                notification.save()
+        
+        if notification.product_image_date:
+            total_day = (current_date - notification.product_image_date).days
+            if total_day >= 3 and notification.product_image == 'delay' :
+                notification.product_image = 'pending'
+                notification.product_image_date = date.today()
+                notification.save()
+
+        if notification.business_verify_date:
+            total_day = (current_date - notification.business_verify_date).days
+            if total_day >= 3 and notification.business_verify == 'delay' :
+                notification.business_verify = 'pending'
+                notification.business_verify_date = date.today()
+                notification.save()
+                
+        return JsonResponse({'id': notification.id,
+                             'business_detail':notification.business_detail,
+                             'business_detail_date':notification.business_detail_date,
+                             'product_image':notification.product_image,
+                             'product_image_date':notification.product_image_date,
+                             'business_verify':notification.business_verify,
+                             'business_verify_date':notification.business_verify_date
+                             }, safe=False, status=200)
+    
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

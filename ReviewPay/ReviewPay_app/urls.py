@@ -5,6 +5,10 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views, api_views, get_api_views, delete_view, google_view
 
 urlpatterns = [
+    # Business Message Alert
+    path('reviewpayrole_api/business_message_alert/', get_api_views.business_message_alert, name='business_message_alert'),
+    path('reviewpayrole_api/notification/',get_api_views.notification, name='notification'),
+    path('reviewpayrole_api/dissmise_notification/',api_views.dissmise_notification, name='notification_disemise'),
     # QR Code
     path('reviewpayrole_api/generate_qr/<str:Business_id>/', get_api_views.generate_qr_api, name='generate_qr_api'),
     path('reviewpayrole_api/qr_scan/', get_api_views.qr_scan_api, name='qr_scan_api'),  # Scan API

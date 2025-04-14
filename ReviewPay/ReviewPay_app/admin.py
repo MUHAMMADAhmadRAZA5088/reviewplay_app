@@ -6,7 +6,7 @@ from django.utils.html import mark_safe
 from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import BusinessState, ProductImage, Barcode, UserDetail
 from .models import Feedback, BusinessVerifications,CommingsoonLogin
-from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback
+from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback,Notifications
 from .models import ReferralCashback,ReferralCashback, UserCashBack, OrderTracking,QRScan
 #BusinessImage, BusinessVideo
 from django.contrib import admin
@@ -371,6 +371,21 @@ class QRScanAdmin(admin.ModelAdmin):
             css = {
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
+
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('id','user_id','business_detail','business_detail_date','product_image','product_image_date','business_verify','business_verify_date','delete_option')
+    # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+admin.site.register(Notifications,NotificationAdmin)
 admin.site.register(QRScan,QRScanAdmin)
 admin.site.register(OrderTracking,OrderTrackingAdmin)
 admin.site.register(UserCashBack,UserCashBackAdmin)
