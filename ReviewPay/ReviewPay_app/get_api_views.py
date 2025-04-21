@@ -8,6 +8,8 @@ import uuid
 
 from datetime import date
 from django.http import HttpResponse
+from django.shortcuts import redirect
+
 import secrets
 from io import BytesIO
 from django.core.files.base import ContentFile
@@ -434,14 +436,15 @@ def qr_scan_api(request):
             scan_url=url,
             status=status
         )
-        return JsonResponse({
-            "message": "Scan recorded",
-            "status": "pending",
-            "scan_id": scan_entry.id,  
-            "business_id" : business_id,
-            "user_id" : user_id,
-            "website_url" : f"{url}?uccid={scan_entry.id}&user_id{user_id}&business_id={business_id}"
-        }, status=200)
+        return redirect(f"{url}?uccid={scan_entry.id}&user_id{user_id}&business_id={business_id}")
+        # return JsonResponse({
+        #     "message": "Scan recorded",
+        #     "status": "pending",
+        #     "scan_id": scan_entry.id,  
+        #     "business_id" : business_id,
+        #     "user_id" : user_id,
+        #     "website_url" : f"{url}?uccid={scan_entry.id}&user_id{user_id}&business_id={business_id}"
+        # }, status=200)
     
     return JsonResponse({"error": "Invalid request"}, status=400)
 
