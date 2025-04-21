@@ -389,7 +389,6 @@ def get_cashback(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def generate_qr_api(request, Business_id):
     
     try:
@@ -530,5 +529,106 @@ def notification(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_business_detail_one(request):
-    pass
+def get_business_detail_one(request, Business_id):
+
+    try :
+        business_detail = Businessdetail.objects.get(id = Business_id)
+        videos = business_detail.business_video.all()
+        logos = business_detail.business_logo.all() 
+        images = business_detail.business_image.all()
+
+    except:
+        return JsonResponse({'error':'data is not find'}, status=404)
+
+    try:
+        data = {
+                'id': business_detail.id,
+                'business_name': business_detail.business_name,
+                'marchant api' : business_detail.marchant_api_key,
+                'email' : business_detail.business.email,
+                'business_address' : business_detail.business_address,
+                'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
+                'category': business_detail.category,
+                'sub_category': business_detail.sub_category,
+                'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
+                'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
+                'images': ['https://superadmin.reviewpay.com.au' + image.image.url for image in images],
+                "review_cashbacks": list(business_detail.ReviewCashback.all().values(
+                                        "id", "review_amount_cashback_percent", "review_amount_cashback_fixed",
+                                        "review_cashback_return_refund_period", "review_cashback_expiry"
+                )),
+                # Referral Cashback
+                "referral_cashbacks": list(business_detail.ReferralCashback.all().values(
+                                        "id", "referral_cashback_enabled", "referral_amount_cashback_percent",
+                                        "referral_amount_cashback_fixed", "referral_cashback_return_refund_period",
+                                        "referral_cashback_expiry"
+                )),
+                }
+
+        # Return the data as JSON
+        return JsonResponse(data, safe=False, status=200)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+
+@api_view(['GET'])
+def generate_qr_business(request, Business_id):
+    
+    try:
+        business_detail_instance = Businessdetail.objects.get(id=Business_id)
+    except:
+        return JsonResponse({'error':'business not found'}, status=404)
+    
+    data = f"https://superadmin.reviewpay.com.aureviewpayrole_api/qr_scan/?Business_id={Business_id}&url={business_detail_instance.business_url}&status=pending"
+    # Create the QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    # Create image from QR code
+    img = qr.make_image(fill="black", back_color="white")
+
+    # Save image to a BytesIO object to send in the response
+    buffer = BytesIO()
+    img.save(buffer)
+    buffer.seek(0)
+
+    # Return the image as HTTP response
+    return HttpResponse(buffer, content_type="image/png")
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def qr_scan_api_business(request):
+    user_id = request.user.id
+    business_id = request.GET.get("Business_id")
+    status = request.GET.get("status")
+    url = request.GET.get("url")
+    scan_url = request.build_absolute_uri()
+
+    # Store scan in database
+    if user_id and business_id:
+        scan_entry = QRScan.objects.create(
+            user_id=user_id,
+            business_id=business_id,
+            scan_url=url,
+            status=status
+        )
+        # return redirect(f"{url}?uccid={scan_entry.id}&user_id{user_id}&business_id={business_id}")
+        return JsonResponse({
+            "message": "Scan recorded",
+            "status": "pending",
+            "scan_id": scan_entry.id,  
+            "business_id" : business_id,
+            "user_id" : user_id,
+            "website_url" : f"{url}?uccid={scan_entry.id}&user_id{user_id}&business_id={business_id}"
+        }, status=200)
+    
+    return JsonResponse({"massage": "please login the reviewpay",url : "https://reviewpay.com.au/signin"}, status=400)
