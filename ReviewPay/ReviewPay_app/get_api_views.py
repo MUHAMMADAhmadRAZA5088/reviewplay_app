@@ -52,7 +52,7 @@ def get_user_detail(request):
                 'last_name': user_detail.last_name,  # Assuming you want to send the ID of the related business
                 'gender': user_detail.gender,
                 'date_of_birth': user_detail.date_of_birth,
-                'profile_image': 'https://superadmin.reviewpay.com.au/' + user_detail.profile_image.url if user_detail.profile_image else None,  # Check if profile_image exists
+                'profile_image': 'https://superadmin.reviewpay.com.au' + user_detail.profile_image.url if user_detail.profile_image else None,  # Check if profile_image exists
                 'phone_number': user_detail.phone_number,
                 'post_code' : user_detail.post_code,
             }
@@ -329,9 +329,9 @@ def get_business_verification(request):
                 'admin_email' : business_verification.admin_email,
                 'client_email' : business_verification.client_email,
                 'openning_hours' : business_verification.openning_hours,
-                'government_issue_document' : 'https://superadmin.reviewpay.com.au/'+ business_verification.government_issue_document.url if business_verification.government_issue_document else None,
-                'business_name_evidence' : 'https://superadmin.reviewpay.com.au/'+ business_verification.business_name_evidence.url if business_verification.business_name_evidence else None,
-                'company_extract_issue' : 'https://superadmin.reviewpay.com.au/'+ business_verification.company_extract_issue.url if business_verification.company_extract_issue else None,  # Check if profile_image exists,
+                'government_issue_document' : 'https://superadmin.reviewpay.com.au'+ business_verification.government_issue_document.url if business_verification.government_issue_document else None,
+                'business_name_evidence' : 'https://superadmin.reviewpay.com.au'+ business_verification.business_name_evidence.url if business_verification.business_name_evidence else None,
+                'company_extract_issue' : 'https://superadmin.reviewpay.com.au'+ business_verification.company_extract_issue.url if business_verification.company_extract_issue else None,  # Check if profile_image exists,
             }
 
         # Return the data as JSON
@@ -397,7 +397,7 @@ def generate_qr_api(request, Business_id):
     except:
         return JsonResponse({'error':'business not found'}, status=404)
     
-    data = f"https://superadmin.reviewpay.com.au/reviewpayrole_api/qr_scan/?user_id={request.user.id}&Business_id={Business_id}&url={business_detail_instance.business_url}&status=pending"
+    data = f"https://superadmin.reviewpay.com.aureviewpayrole_api/qr_scan/?user_id={request.user.id}&Business_id={Business_id}&url={business_detail_instance.business_url}&status=pending"
     # Create the QR code
     qr = qrcode.QRCode(
         version=1,
