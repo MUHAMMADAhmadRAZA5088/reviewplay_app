@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views, api_views, get_api_views, delete_view, google_view
 
 urlpatterns = [
-    
+
     # Business Message Alert
     path('reviewpayrole_api/business_message_alert/', get_api_views.business_message_alert, name='business_message_alert'),
     path('reviewpayrole_api/notification/',get_api_views.notification, name='notification'),
@@ -49,6 +49,7 @@ urlpatterns = [
     path('reviewpayrole_api/get_user_detail', get_api_views.get_user_detail, name="get_user_detail"),
     path('reviewpayrole_api/get_business_detail', get_api_views.get_business_detail, name="get_business_detail"),
     path('reviewpayrole_api/get_business_detail/all/', get_api_views.get_business_detail_all, name="business_details_all"),
+    path('reviewpayrole_api/get_business_detail/<str:Business_id>/', get_api_views.get_business_detail_one, name="business_details_id"),
     path('reviewpayrole_api/user/user_detail', api_views.user_detail, name='user_detail'),
     # product details
     path('reviewpayrole_api/business/products_detail', api_views.product, name='products_detals'),
