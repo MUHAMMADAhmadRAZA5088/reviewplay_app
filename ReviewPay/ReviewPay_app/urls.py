@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views, api_views, get_api_views, delete_view, google_view
 
 urlpatterns = [
+    
     # Business Message Alert
     path('reviewpayrole_api/business_message_alert/', get_api_views.business_message_alert, name='business_message_alert'),
     path('reviewpayrole_api/notification/',get_api_views.notification, name='notification'),

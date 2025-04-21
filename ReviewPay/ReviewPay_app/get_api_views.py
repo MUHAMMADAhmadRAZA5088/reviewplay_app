@@ -46,12 +46,13 @@ def get_user_detail(request):
         data = {
                 'id': user_detail.id,
                 'first_name': user_detail.first_name,
-                'email' : user_detail.business.email,
+                'email' : user_detail.email,
                 'last_name': user_detail.last_name,  # Assuming you want to send the ID of the related business
                 'gender': user_detail.gender,
                 'date_of_birth': user_detail.date_of_birth,
                 'profile_image': 'http://192.168.100.14:8000' + user_detail.profile_image.url if user_detail.profile_image else None,  # Check if profile_image exists
-                'email' : user_detail.business.email,
+                'phone_number': user_detail.phone_number,
+                'post_code' : user_detail.post_code,
             }
         
         # Return the data as JSON
@@ -394,7 +395,7 @@ def generate_qr_api(request, Business_id):
     except:
         return JsonResponse({'error':'business not found'}, status=404)
     
-    data = f"http://127.0.0.1:8000/reviewpayrole_api/qr_scan/?user_id={request.user.id}&Business_id={Business_id}&url={business_detail_instance.business_url}&status=pending"
+    data = f"https://reviewpay.com.au/reviewpayrole_api/qr_scan/?user_id={request.user.id}&Business_id={Business_id}&url={business_detail_instance.business_url}&status=pending"
     # Create the QR code
     qr = qrcode.QRCode(
         version=1,

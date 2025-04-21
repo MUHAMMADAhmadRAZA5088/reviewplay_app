@@ -5,6 +5,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
+
 # PayPal Token Generate Karna
 @api_view(['GET'])
 def get_paypal_token(request):
@@ -141,3 +142,8 @@ def my_webhook(request):
 
     except Exception as e:
         return Response({"error": str(e)}, status=400)
+    
+
+
+# def product_all(request):
+#     return render(request,'product.html')

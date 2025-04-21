@@ -162,6 +162,9 @@ class UserDetail(models.Model):
     last_name = models.TextField()
     gender = models.CharField(max_length=255)
     date_of_birth  = models.DateField()
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=255)
+    post_code = models.CharField(max_length=10, default='00000')
     profile_image = models.ImageField(upload_to='user_images/', blank=True, null=True)
     class Meta:
         verbose_name = "User Detail"

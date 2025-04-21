@@ -149,7 +149,7 @@ class BusinessVerificationsAdmin(admin.ModelAdmin):
             }
 
 class UserDetailAdmin(admin.ModelAdmin):
-    list_display = ('id','business', 'first_name', 'last_name', 'gender','date_of_birth','profile_image','delete_option')
+    list_display = ('id','business', 'first_name', 'last_name', 'gender','date_of_birth','email','phone_number','post_code','profile_image','delete_option')
 
         # Custom column for delete
     def delete_option(self, obj):

@@ -300,8 +300,11 @@ def user_detail(request):
                                     defaults = {
                                      'first_name' : request.POST.get('first_name'),
                                      'last_name' : request.POST.get('last_name'),
+                                     'email' : request.POST.get('email'),
                                      'gender' : request.POST.get('gender'),
-                                     'date_of_birth' : datetime.strptime(request.POST.get('date_of_birth'), '%d-%m-%Y').date(),
+                                     'phone_number' : request.POST.get('phone_number'),
+                                     'post_code' : request.POST.get('post_code'),
+                                     'date_of_birth' : datetime.strptime(request.POST.get('date_of_birth'), '%d-%m-%Y').date(),                                     
                                      'profile_image' : image
                                     })
         
