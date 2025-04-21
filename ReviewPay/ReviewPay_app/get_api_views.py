@@ -434,14 +434,15 @@ def qr_scan_api(request):
             scan_url=url,
             status=status
         )
-        return JsonResponse({
-            "message": "Scan recorded",
-            "status": "pending",
-            "scan_id": scan_entry.id,  
-            "business_id" : business_id,
-            "user_id" : user_id,
-            "website_url" : f"{url}?id={scan_entry.id}&user_id{user_id}&business_id={business_id}"
-        }, status=200)
+        return HttpResponse(scan_url)
+        # return JsonResponse({
+        #     "message": "Scan recorded",
+        #     "status": "pending",
+        #     "scan_id": scan_entry.id,  
+        #     "business_id" : business_id,
+        #     "user_id" : user_id,
+        #     "website_url" : f"{url}?id={scan_entry.id}&user_id{user_id}&business_id={business_id}"
+        # }, status=200)
     
     return JsonResponse({"error": "Invalid request"}, status=400)
 
