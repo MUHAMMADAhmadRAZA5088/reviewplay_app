@@ -15,6 +15,7 @@ urlpatterns = [
     path('reviewpayrole_api/qr_scan/', get_api_views.qr_scan_api, name='qr_scan_api'),  # Scan API
     path('reviewpayrole_api/generate_qr_business/<str:Business_id>/', get_api_views.generate_qr_business, name='generate_qr_api'),
     path('reviewpayrole_api/qr_scan_api_business/', get_api_views.qr_scan_api_business, name='qr_scan_api_business'),  # Scan API
+    
     # webhook
     path('reviewpayrole_api/webhook/', views.my_webhook, name='webhook'),
 

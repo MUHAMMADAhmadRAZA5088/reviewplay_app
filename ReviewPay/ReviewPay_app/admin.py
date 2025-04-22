@@ -4,8 +4,8 @@ from django.urls import reverse  # Import reverse
 from django.utils.html import format_html  # Import format_html
 from django.utils.html import mark_safe
 from .models import CategoryUsers, Businessdetail, Employee, Product
-from .models import BusinessState, ProductImage, Barcode, UserDetail
-from .models import Feedback, BusinessVerifications,CommingsoonLogin
+from .models import BusinessState, ProductImage, Barcode, UserDetail, favorate_business
+from .models import Feedback, BusinessVerifications,CommingsoonLogin,Welcome_new_user
 from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback,Notifications
 from .models import ReferralCashback,ReferralCashback, UserCashBack, OrderTracking,QRScan
 #BusinessImage, BusinessVideo
@@ -38,7 +38,7 @@ class CategoryUsersAdmin(UserAdmin):
  
 # Register the Businessdetail model with its own admin class
 class BusinessdetailAdmin(admin.ModelAdmin):
-    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number' ,'business_url','delete_option')
+    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number' ,'delete_option')
 
    
         # Custom column for delete
@@ -385,6 +385,46 @@ class NotificationAdmin(admin.ModelAdmin):
             css = {
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
+class Welcome_new_userAdmin(admin.ModelAdmin):
+    list_display = ('id','email','delete_option')
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+class favorate_businessAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user_id', 'business_id', 'delete_option')
+    def user_id(self, obj):
+        return obj.user.id  # Display user ID instead of name
+
+    def business_id(self, obj):
+        return obj.business.id  # Display business ID instead of name
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # This will ensure the ForeignKey fields display IDs in admin forms as well
+        if db_field.name == "user":
+            kwargs["queryset"] = UserDetail.objects.all()
+        elif db_field.name == "business":
+            kwargs["queryset"] = Businessdetail.objects.all()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+admin.site.register(favorate_business, favorate_businessAdmin)   
+admin.site.register(Welcome_new_user, Welcome_new_userAdmin)
 admin.site.register(Notifications,NotificationAdmin)
 admin.site.register(QRScan,QRScanAdmin)
 admin.site.register(OrderTracking,OrderTrackingAdmin)

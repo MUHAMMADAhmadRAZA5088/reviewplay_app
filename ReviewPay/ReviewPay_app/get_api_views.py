@@ -579,10 +579,11 @@ def generate_qr_business(request, Business_id):
     
     try:
         business_detail_instance = Businessdetail.objects.get(id=Business_id)
+        business_user = BusinessVerifications.objects.get(business=business_detail_instance.business)
     except:
         return JsonResponse({'error':'business not found'}, status=404)
     
-    data = f"https://superadmin.reviewpay.com.aureviewpayrole_api/qr_scan/?Business_id={Business_id}&url={business_detail_instance.business_url}&status=pending"
+    data = f"https://superadmin.reviewpay.com.aureviewpayrole_api/qr_scan/?Business_id={Business_id}&url={business_user.business_web}&status=pending"
     # Create the QR code
     qr = qrcode.QRCode(
         version=1,

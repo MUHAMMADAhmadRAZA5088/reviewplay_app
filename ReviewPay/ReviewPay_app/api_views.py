@@ -32,7 +32,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from .models import CategoryUsers, Businessdetail, Employee, Product
 from .models import UserDetail, Feedback, Barcode, ProductImage
-from .models import BusinessVerifications,CommingsoonLogin
+from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking
 from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications
 User = get_user_model()  # Get the custom user model
@@ -107,7 +107,14 @@ def api_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)  # Log the user in (creates a session)
-
+            try:
+                data = Welcome_new_user.objects.get(email=username) 
+                massage = 'None'
+            except:
+               Welcome_new_user.objects.create(
+                   email = username
+               )
+               massage = 'Nice to meet you, Dear! Your ReviewPay journey starts now – explore, connect, and get the best!'
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
@@ -116,7 +123,8 @@ def api_login(request):
                 'message': 'Login successful!',
                 'role': user.role,
                 'access_token': access_token,
-                'refresh_token': str(refresh)
+                'refresh_token': str(refresh),
+                'notification' : massage
             }, status=200)
         else:
             return JsonResponse({'error': 'Invalid credentials'}, status=400)

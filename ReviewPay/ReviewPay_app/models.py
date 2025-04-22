@@ -38,7 +38,6 @@ class Businessdetail(models.Model):
     abn_number = models.CharField(max_length=20, null=True, blank=True)
     business_name = models.CharField(max_length=100, null=True, blank=True)
     business_address = models.TextField(null=True, blank=True)
-    business_url = models.URLField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.marchant_api_key:  # Agar API key nahi hai to generate karo
@@ -263,3 +262,16 @@ class Notifications(models.Model):
     product_image_date = models.DateField(null=True, blank=True)
     business_verify = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     business_verify_date = models.DateField(null=True, blank=True)
+
+class Welcome_new_user(models.Model):
+    email = models.EmailField()
+
+class favorate_business(models.Model):
+    user = models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name='favorite_businesses')
+    business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name='favorited_by')
+
+    class Meta:
+        unique_together = ('user', 'business')  # prevent duplicates
+
+    def __str__(self):
+        return f"{self.user.id} ♥ {self.business.id}"
