@@ -31,7 +31,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import datetime
-from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee
+from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, favorate_business
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState
 from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
 User = get_user_model()  # Get the custom user model
@@ -633,3 +633,80 @@ def qr_scan_api_business(request):
         }, status=200)
     
     return JsonResponse({"massage": "please login the reviewpay",url : "https://reviewpay.com.au/signin"}, status=400)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def get_favorite_businesses(request):
+    user = request.user
+    user = UserDetail.objects.get(business=user)
+    favorites = favorate_business.objects.filter(user=user)
+    all_data = []
+    try:
+        for favorite in favorites:
+            try:
+                business_detail = Businessdetail.objects.get(id= favorite.business_id)
+                business_verification = BusinessVerifications.objects.get(business= business_detail.business) 
+                
+                verification = {
+                    'id': business_verification.id,
+                    'business_web': business_verification.business_web,
+                    'ACN' : business_verification.ACN,
+                    'fullname_director_1' : business_verification.fullname_director_1,
+                    'fullname_director_2' : business_verification.fullname_director_2,
+                    'admin_phone_number' : business_verification.admin_phone_number,
+                    'business_phone_number' : business_verification.business_phone_number,
+                    'facebook_link' : business_verification.facebook_link,
+                    'instagram_link' : business_verification.instra_link,
+                    'admin_email' : business_verification.admin_email,
+                    'client_email' : business_verification.client_email,
+                    'openning_hours' : business_verification.openning_hours,
+                }
+                
+            except:
+                verification = {}
+
+            try :
+                videos = business_detail.business_video.all()
+                logos = business_detail.business_logo.all() 
+                images = business_detail.business_image.all()
+
+            except:
+                return JsonResponse({'error':'data is not find'}, status=404)
+
+            try:
+                data = {
+                        'favirote' : favorite.id,
+                        'id': business_detail.id,
+                        'business_name': business_detail.business_name,
+                        'marchant api' : business_detail.marchant_api_key,
+                        'email' : business_detail.business.email,
+                        'business_address' : business_detail.business_address,
+                        'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
+                        'category': business_detail.category,
+                        'sub_category': business_detail.sub_category,
+                        'business_verification': verification,
+                        'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
+                        'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
+                        'images': ['https://superadmin.reviewpay.com.au' + image.image.url for image in images],
+                        "review_cashbacks": list(business_detail.ReviewCashback.all().values(
+                                                "id", "review_amount_cashback_percent", "review_amount_cashback_fixed",
+                                                "review_cashback_return_refund_period", "review_cashback_expiry"
+                        )),
+                        # Referral Cashback
+                        "referral_cashbacks": list(business_detail.ReferralCashback.all().values(
+                                                "id", "referral_cashback_enabled", "referral_amount_cashback_percent",
+                                                "referral_amount_cashback_fixed", "referral_cashback_return_refund_period",
+                                                "referral_cashback_expiry"
+                        )),
+                        }
+                all_data.append(data)
+            except:
+                return JsonResponse({'error':'data is not find'}, status=404)
+                # Return the data as JSON
+
+        return JsonResponse(all_data, safe=False, status=200)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)  

@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import datetime
-from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee
+from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee,favorate_business
 from .models import Product, UserDetail, Feedback,  Product, ProductImage, Barcode
 
 @api_view(['GET'])
@@ -49,3 +49,24 @@ def delete_product(request, slug=None):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def delete_favorite_business(request, slug=None):
+    try:
+        user = request.user
+        user = UserDetail.objects.get(business=user)
+        favorites = favorate_business.objects.filter(user=user)
+        if slug:
+            for favorite in favorites:
+                if favorite.id == slug:
+                    favorite.delete()
+                    return JsonResponse({'message': 'favorite business deleted successfully.'}, status=200)
+  # Replace `id` with slug if necessary
+        else:
+            return JsonResponse({'error': 'Product ID or slug is required.'}, status=400)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)  

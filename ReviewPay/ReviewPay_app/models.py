@@ -266,6 +266,7 @@ class Notifications(models.Model):
 class Welcome_new_user(models.Model):
     email = models.EmailField()
 
+
 class favorate_business(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name='favorite_businesses')
     business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name='favorited_by')

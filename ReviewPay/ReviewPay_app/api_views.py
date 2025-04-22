@@ -31,7 +31,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.models import User
 from .models import CategoryUsers, Businessdetail, Employee, Product
-from .models import UserDetail, Feedback, Barcode, ProductImage
+from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business
 from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking
 from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications
@@ -750,3 +750,27 @@ def dissmise_notification(request):
                 'business_verify':notification.business_verify,
                 'business_verify_date':notification.business_verify_date
                 }, safe=False, status=200)
+
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def favorite_businesses(request):
+    try:
+        user = request.user
+        if user.role == 'user' :
+            user = UserDetail.objects.get(business=user)
+            business_id = request.POST.get('business_id')
+            business = Businessdetail.objects.get(id=business_id)
+        
+            favorate_business.objects.create(
+                user = user, business = business
+            )
+            return JsonResponse({'massage' : 'Business added to favorites successfully.'}, safe=False, status=200)
+        else:
+            return JsonResponse({'error': 'Only users can favorite businesses.'}, status=403)
+    
+    
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

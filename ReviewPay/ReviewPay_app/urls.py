@@ -6,6 +6,11 @@ from . import views, api_views, get_api_views, delete_view, google_view
 
 urlpatterns = [
 
+
+    # favorate business api
+    path('reviewpayrole_api/add_favorite_business/', api_views.favorite_businesses, name='business_add_favorite'),
+    path('reviewpayrole_api/get_favorite_business/', get_api_views.get_favorite_businesses, name='get_business_favorite'),
+    path('reviewpayrole_api/delete_favorite_business/<int:slug>/',delete_view.delete_favorite_business, name="delete_business_favorite"),
     # Business Message Alert
     path('reviewpayrole_api/business_message_alert/', get_api_views.business_message_alert, name='business_message_alert'),
     path('reviewpayrole_api/notification/',get_api_views.notification, name='notification'),
@@ -60,7 +65,7 @@ urlpatterns = [
     path('reviewpayrole_api/delete_product/<int:slug>/',delete_view.delete_product, name="delete_product"),
     path('reviewpayrole_api/business/employee_detail', api_views.employee_detail, name='employee_detail'),
     path('reviewpayrole_api/business/business_detail', api_views.create_or_update_business_detail, name='business_detail'),
-  
+    # businesses api
     path('reviewpayrole_api/business/business_verification', api_views.business_verifications, name='business_verification'),   
     path('reviewpayrole_api/business/get_business_verification', get_api_views.get_business_verification, name='business_verification'),     
     path('reviewpayrole_api/signup/', api_views.api_signup, name='api_signup'),
