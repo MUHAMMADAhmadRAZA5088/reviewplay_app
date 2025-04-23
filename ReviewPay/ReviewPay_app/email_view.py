@@ -40,7 +40,7 @@ from .models import Product, UserDetail, Feedback,  Product, ProductImage, Barco
 def send_email(request):
     import pdb;pdb.set_trace()
     configuration = sib_api_v3_sdk.Configuration()
-    # configuration.api_key['api-key'] = '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'
+    
 
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
 
