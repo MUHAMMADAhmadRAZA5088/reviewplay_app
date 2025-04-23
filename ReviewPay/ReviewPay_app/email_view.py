@@ -38,4 +38,17 @@ from .models import Product, UserDetail, Feedback,  Product, ProductImage, Barco
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def send_email(request):
-    pass
+    import pdb;pdb.set_trace()
+    configuration = sib_api_v3_sdk.Configuration()
+    
+
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+
+    subject = "My Subject"
+    html_content = "<html><body><h1>This is my first transactional email </h1></body></html>"
+    sender = {"name":"Robert","email":"hello@reviewpay.com.au"}
+    to = [{"email":"ahmadelectricaltraders@gmail.com","name":"ahmad"}]
+    headers = {"Some-Custom-Name":"unique-id-1234"}
+    params = {"parameter":"My param value","subject":"New Subject"}
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers, html_content=html_content, sender=sender, subject=subject)
+    import pdb;pdb.set_trace()
