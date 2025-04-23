@@ -2,11 +2,12 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenRefreshView
-from . import views, api_views, get_api_views, delete_view, google_view
+from . import views, api_views, get_api_views, delete_view, google_view, email_view
 
 urlpatterns = [
 
-
+    # email send api
+    path('reviewpayrole_api/send_email/', email_view.send_email, name='send_email'),
     # favorate business api
     path('reviewpayrole_api/add_favorite_business/', api_views.favorite_businesses, name='business_add_favorite'),
     path('reviewpayrole_api/get_favorite_business/', get_api_views.get_favorite_businesses, name='get_business_favorite'),
