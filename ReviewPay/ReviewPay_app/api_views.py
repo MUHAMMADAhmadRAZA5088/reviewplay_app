@@ -112,6 +112,7 @@ def api_login(request):
                 massage = 'None'
             except:
                Welcome_new_user.objects.create(
+                   user = user,
                    email = username
                )
                massage = 'Nice to meet you, Dear! Your ReviewPay journey starts now – explore, connect, and get the best!'

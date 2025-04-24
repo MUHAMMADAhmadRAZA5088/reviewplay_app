@@ -264,6 +264,7 @@ class Notifications(models.Model):
     business_verify_date = models.DateField(null=True, blank=True)
 
 class Welcome_new_user(models.Model):
+    user =  models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name='new_user')
     email = models.EmailField()
 
 
