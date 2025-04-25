@@ -6,6 +6,7 @@ from . import views, api_views, get_api_views, delete_view, google_view, email_v
 
 urlpatterns = [
     # product_business_request_api
+    path('reviewpayrole_api/product_client_review/', api_views.product_client_review, name='product_client_review'),
     path('reviewpayrole_api/product_business_invoice/', api_views.product_business_invoice, name='product_business_invoice'),
     # email send api
     path('reviewpayrole_api/send_email/', email_view.send_email, name='send_email'),

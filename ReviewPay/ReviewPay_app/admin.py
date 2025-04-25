@@ -435,6 +435,7 @@ class Product_business_invoiceAdmin(admin.ModelAdmin):
             css = {
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
+
 admin.site.register(Product_business_invoice, Product_business_invoiceAdmin)  
 admin.site.register(favorate_business, favorate_businessAdmin)   
 admin.site.register(Welcome_new_user, Welcome_new_userAdmin)

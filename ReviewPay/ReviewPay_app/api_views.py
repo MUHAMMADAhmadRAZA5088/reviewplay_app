@@ -35,7 +35,7 @@ from datetime import datetime
 from django.contrib.auth.models import User 
 from .models import CategoryUsers, Businessdetail, Employee, Product, Product_business_invoice
 from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business
-from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user
+from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user, ProductClientReview
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking
 from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications
 User = get_user_model()  # Get the custom user model
@@ -764,7 +764,7 @@ def send_email(email ,name ,phone ,client_id ,product_id,business_id):
             data = json.load(file)   
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = data["key"]
-    website_url = f"https://reviewpay.com.au/UserDashboard/BusinessPostReview?client_id={client_id}&product_id={product_id}&business_id={business_id}"
+    website_url = f"https://reviewpay.com.au/UserDashboard/BusinessPostReview?product_id={product_id}&business_id={business_id}"
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     subject = "Reviewpay product invoice"
     html_content = f"<html><body><h1>Thank you for your purchase!</h1><p>Dear Customer,</p>{website_url}<p></p> </body></html>"
@@ -813,7 +813,7 @@ def product_business_invoice(request):
         user = request.user
         if user.role == 'business' :
             data = request.POST
-            user_simple = CategoryUsers.objects.get(id= data.get('user_id'))
+            user_simple = CategoryUsers.objects.get(email= data.get('client_email'))
             business = BusinessVerifications.objects.get(business= user)
             product_service = data.get('product_service')
             invoice_amount = data.get('invoice_amount')
@@ -845,4 +845,40 @@ def product_business_invoice(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-    import pdb;pdb.set_trace()
+
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def product_client_review(request):
+    try:
+        user = request.user
+        data = request.POST
+        user_simple = CategoryUsers.objects.get(id = user.id)
+        product = Product_business_invoice.objects.get(id= data["product_id"]) 
+        business = BusinessVerifications.objects.get(id= data["business_id"])
+        project_review_client = ProductClientReview.objects.create(
+        product_id = product,
+        user = user_simple,
+        business = business,
+        benefit_quality = int(data['benefit_quality']),
+        benefit_performance = int(data['benefit_performance']),
+        benefit_rate = int(data['benefit_rate']),
+        benefit_training = int(data['benefit_training']),
+        culture_expertise = int(data['culture_expertise']),
+        culture_extra_care = int(data['culture_extra_care']),
+        culture_responsiveness = int(data['culture_responsiveness']),
+        culture_professionalism = int(data['culture_professionalism']),
+        operator_business_support = int(data['operator_business_support']),
+        operator_delivery = int(data['operator_delivery']),
+        operator_offering = int(data['operator_offering']),
+        hear_about_us = data['hear_about_us'],
+        experience = data['experience']
+        )
+        if project_review_client:
+            product.status = "approve" 
+            product.save
+            return JsonResponse({"massage":"approve data successfully"}, status = 200)
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

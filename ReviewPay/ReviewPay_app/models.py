@@ -2,6 +2,8 @@ import secrets
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.timezone import now
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 class CategoryUsers(AbstractUser):
     # Custom fields for normal users
@@ -295,6 +297,34 @@ class Product_business_invoice(models.Model):
     client_email = models.CharField(max_length=100)
     status = models.CharField(max_length=20, default='pending')
     proof_purchase = models.FileField(upload_to='product_proof_purchase/', null=True, blank=True)
+
+
+class ProductClientReview(models.Model):
+    product_id = models.OneToOneField(Product_business_invoice, on_delete=models.CASCADE, related_name="prouct_id")
+    user = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="product_user_id")
+    business = models.ForeignKey(BusinessVerifications, on_delete=models.CASCADE, related_name='product_business')
+    
+    benefit_quality = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    benefit_performance = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    benefit_rate = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    benefit_training = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    
+    culture_expertise = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    culture_extra_care = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    culture_responsiveness = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    culture_professionalism = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    
+    operator_business_support = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    operator_delivery = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    operator_offering = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    
+    hear_about_us = models.CharField(max_length=255)
+    experience = models.TextField()
+    document = models.FileField(upload_to='product_client_review/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)  # set on create
+    updated_at = models.DateTimeField(auto_now=True)      # update on every save
+    def __str__(self):
+        return f"Review for Product {self.product_id}"
 
 
 
