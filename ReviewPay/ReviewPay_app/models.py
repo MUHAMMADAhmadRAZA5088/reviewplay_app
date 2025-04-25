@@ -293,6 +293,7 @@ class Product_business_invoice(models.Model):
     client_name = models.CharField(max_length=100)
     client_phone = models.CharField(max_length=100)
     client_email = models.CharField(max_length=100)
+    status = models.CharField(max_length=20, default='pending')
     proof_purchase = models.FileField(upload_to='product_proof_purchase/', null=True, blank=True)
 
 
