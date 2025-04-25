@@ -5,7 +5,10 @@ import base64
 import os
 from decimal import Decimal
 from uuid import uuid4
-
+import time
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
+from pprint import pprint
 from datetime import date
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
@@ -29,8 +32,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
 from datetime import datetime
-from django.contrib.auth.models import User
-from .models import CategoryUsers, Businessdetail, Employee, Product
+from django.contrib.auth.models import User 
+from .models import CategoryUsers, Businessdetail, Employee, Product, Product_business_invoice
 from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business
 from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking
@@ -303,7 +306,6 @@ def user_detail(request):
             new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
             image.name = new_file_name  # Assign the new name
             # Check if required data is present
-
             user_detail, created = UserDetail.objects.update_or_create(
                                     business = user,
                                     defaults = {
@@ -752,6 +754,33 @@ def dissmise_notification(request):
                 'business_verify_date':notification.business_verify_date
                 }, safe=False, status=200)
 
+
+def send_email(email ,name ,phone ,client_id ,product_id,business_id):
+    try:
+        with open('/home/ubuntu/email_send/email_key.json', 'r') as file:
+            data = json.load(file)
+    except:
+        with open('C:\\bravo\email_key.json', 'r') as file:
+            data = json.load(file)   
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = data["key"]
+    website_url = f"https://reviewpay.com.au/UserDashboard/BusinessPostReview?client_id={client_id}&product_id={product_id}&business_id={business_id}"
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    subject = "Reviewpay product invoice"
+    html_content = f"<html><body><h1>Thank you for your purchase!</h1><p>Dear Customer,</p>{website_url}<p></p> </body></html>"
+    sender = {"name":"Robert","email":"hello@reviewpay.com.au"}
+    to = [{"email": email,"name": name}]
+    headers = {"Some-Custom-Name":"unique-id-1234"}
+    params = {"parameter":"My param value","subject":"New Subject"}
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers, html_content=html_content, sender=sender, subject=subject)
+
+    try:
+        api_response = api_instance.send_transac_email(send_smtp_email)
+        return "sucess"
+    except:
+        return "false"
+
+
 @csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -775,3 +804,45 @@ def favorite_businesses(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def product_business_invoice(request):
+    try:
+        user = request.user
+        if user.role == 'business' :
+            data = request.POST
+            user_simple = CategoryUsers.objects.get(id= data.get('user_id'))
+            business = BusinessVerifications.objects.get(business= user)
+            product_service = data.get('product_service')
+            invoice_amount = data.get('invoice_amount')
+            reviewcashback = data.get('reviewcashback')
+            refferial_code = data.get('refferial_code')
+            client_name = data.get('client_name')
+            client_phone = data.get('client_phone')
+            client_email = data.get('client_email')
+            product = Product_business_invoice.objects.create(
+                user = user_simple,
+                business = business,
+                product_service = product_service,
+                invoice_amount = invoice_amount,
+                reviewcashback = reviewcashback,
+                refferial_code = refferial_code,
+                client_name = client_name,
+                client_phone = client_phone,
+                client_email = client_email
+            )
+            
+            email_status = send_email(client_email,client_name,client_phone,user_simple.id,product.id,business.id)
+            if email_status == "sucess":
+                return JsonResponse({"massage":f"create sucessfully invoice and send email {client_email}."}, status = 200)
+            else:
+                return JsonResponse({"massage":"create sucessfully invoice and not send email."}, status = 403)
+        else:
+            return JsonResponse({'error': 'Only users can favorite businesses.'}, status=403)
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    import pdb;pdb.set_trace()

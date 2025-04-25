@@ -277,3 +277,24 @@ class favorate_business(models.Model):
 
     def __str__(self):
         return f"{self.user.id} ♥ {self.business.id}"
+
+class Product_business_invoice(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approve', 'Approve'),
+        ('fill', 'Fill'),
+    ]
+    user = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="user_id")
+    business = models.ForeignKey(BusinessVerifications, on_delete=models.CASCADE, related_name='business_detail')
+    product_service = models.CharField(max_length=100)
+    invoice_amount = models.CharField(max_length=100)
+    reviewcashback = models.CharField(max_length=100)
+    refferial_code = models.CharField(max_length=100)
+    client_name = models.CharField(max_length=100)
+    client_phone = models.CharField(max_length=100)
+    client_email = models.CharField(max_length=100)
+    proof_purchase = models.FileField(upload_to='product_proof_purchase/', null=True, blank=True)
+
+
+
+

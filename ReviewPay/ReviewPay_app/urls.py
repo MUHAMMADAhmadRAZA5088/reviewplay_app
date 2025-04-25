@@ -5,7 +5,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views, api_views, get_api_views, delete_view, google_view, email_view
 
 urlpatterns = [
-
+    # product_business_request_api
+    path('reviewpayrole_api/product_business_invoice/', api_views.product_business_invoice, name='product_business_invoice'),
     # email send api
     path('reviewpayrole_api/send_email/', email_view.send_email, name='send_email'),
     # favorate business api

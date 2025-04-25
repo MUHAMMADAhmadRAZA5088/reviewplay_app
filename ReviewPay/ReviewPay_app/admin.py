@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse  # Import reverse
 from django.utils.html import format_html  # Import format_html
 from django.utils.html import mark_safe
-from .models import CategoryUsers, Businessdetail, Employee, Product
+from .models import CategoryUsers, Businessdetail, Employee, Product,Product_business_invoice
 from .models import BusinessState, ProductImage, Barcode, UserDetail, favorate_business
 from .models import Feedback, BusinessVerifications,CommingsoonLogin,Welcome_new_user
 from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback,Notifications
@@ -422,7 +422,20 @@ class favorate_businessAdmin(admin.ModelAdmin):
             css = {
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
-
+class Product_business_invoiceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user_id', 'business_id', 'product_service', 'invoice_amount', 'reviewcashback', 'refferial_code','client_name','client_phone','client_email','proof_purchase','delete_option')
+        # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+admin.site.register(Product_business_invoice, Product_business_invoiceAdmin)  
 admin.site.register(favorate_business, favorate_businessAdmin)   
 admin.site.register(Welcome_new_user, Welcome_new_userAdmin)
 admin.site.register(Notifications,NotificationAdmin)
