@@ -8,6 +8,7 @@ from .models import BusinessState, ProductImage, Barcode, UserDetail, favorate_b
 from .models import Feedback, BusinessVerifications,CommingsoonLogin,Welcome_new_user
 from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback,Notifications
 from .models import ReferralCashback,ReferralCashback, UserCashBack, OrderTracking,QRScan
+from .models import Follow, ProductClientReview
 #BusinessImage, BusinessVideo
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -436,6 +437,36 @@ class Product_business_invoiceAdmin(admin.ModelAdmin):
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
 
+class ProductClientReviewAdmn(admin.ModelAdmin):
+    list_display = ('id', 'product_id', 'user', 'business','benefit_quality', 'delete_option')
+        # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+class FollowAdmn(admin.ModelAdmin):
+    list_display = ('id', 'follower', 'following', 'created_at')
+        # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+admin.site.register(ProductClientReview ,ProductClientReviewAdmn)
+admin.site.register(Follow ,FollowAdmn)
 admin.site.register(Product_business_invoice, Product_business_invoiceAdmin)  
 admin.site.register(favorate_business, favorate_businessAdmin)   
 admin.site.register(Welcome_new_user, Welcome_new_userAdmin)
