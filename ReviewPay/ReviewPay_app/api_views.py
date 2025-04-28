@@ -34,7 +34,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.models import User 
 from .models import CategoryUsers, Businessdetail, Employee, Product, Product_business_invoice
-from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business
+from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business, Follow
 from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user, ProductClientReview
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking
 from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications
@@ -815,30 +815,31 @@ def product_business_invoice(request):
             data = request.POST
             user_simple = CategoryUsers.objects.get(email= data.get('client_email'))
             business = BusinessVerifications.objects.get(business= user)
-            product_service = data.get('product_service')
-            invoice_amount = data.get('invoice_amount')
-            reviewcashback = data.get('reviewcashback')
-            refferial_code = data.get('refferial_code')
-            client_name = data.get('client_name')
-            client_phone = data.get('client_phone')
-            client_email = data.get('client_email')
-            product = Product_business_invoice.objects.create(
-                user = user_simple,
-                business = business,
-                product_service = product_service,
-                invoice_amount = invoice_amount,
-                reviewcashback = reviewcashback,
-                refferial_code = refferial_code,
-                client_name = client_name,
-                client_phone = client_phone,
-                client_email = client_email
-            )
-            
-            email_status = send_email(client_email,client_name,client_phone,user_simple.id,product.id,business.id)
-            if email_status == "sucess":
-                return JsonResponse({"massage":f"create sucessfully invoice and send email {client_email}."}, status = 200)
-            else:
-                return JsonResponse({"massage":"create sucessfully invoice and not send email."}, status = 403)
+            if data.get('product_service') != '' and data.get('client_email') != '':
+                product_service = data.get('product_service')
+                invoice_amount = data.get('invoice_amount')
+                reviewcashback = data.get('reviewcashback')
+                refferial_code = data.get('refferial_code')
+                client_name = data.get('client_name')
+                client_phone = data.get('client_phone')
+                client_email = data.get('client_email')
+                product = Product_business_invoice.objects.create(
+                    user = user_simple,
+                    business = business,
+                    product_service = product_service,
+                    invoice_amount = invoice_amount,
+                    reviewcashback = reviewcashback,
+                    refferial_code = refferial_code,
+                    client_name = client_name,
+                    client_phone = client_phone,
+                    client_email = client_email
+                )
+                
+                email_status = send_email(client_email,client_name,client_phone,user_simple.id,product.id,business.id)
+                if email_status == "sucess":
+                    return JsonResponse({"massage":f"create sucessfully invoice and send email {client_email}."}, status = 200)
+                else:
+                    return JsonResponse({"massage":"create sucessfully invoice and not send email."}, status = 403)
         else:
             return JsonResponse({'error': 'Only users can favorite businesses.'}, status=403)
     except KeyError as e:
@@ -882,3 +883,27 @@ def product_client_review(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def follow_user(request):
+    user = request.user
+    try:
+        data = request.POST
+        user_id_to_follow = data['user_id']
+
+        try:
+            user_to_follow = User.objects.get(id=user_id_to_follow)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+
+        if Follow.objects.filter(follower=user, following=user_to_follow).exists():
+            return JsonResponse({'message': 'Already following'}, status=400)
+
+        Follow.objects.create(follower=user, following=user_to_follow)
+        return JsonResponse({'message': f'Now following {user_to_follow.username}'})
+
+    except:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)

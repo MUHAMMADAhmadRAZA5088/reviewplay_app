@@ -326,6 +326,9 @@ class ProductClientReview(models.Model):
     def __str__(self):
         return f"Review for Product {self.product_id}"
 
-
+class Follow(models.Model):
+    follower = models.ForeignKey(CategoryUsers, related_name='following_set', on_delete=models.CASCADE)
+    following = models.ForeignKey(CategoryUsers, related_name='follower_set', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 

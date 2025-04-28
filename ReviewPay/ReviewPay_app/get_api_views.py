@@ -32,7 +32,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, favorate_business
-from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState
+from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState, Follow
 from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
 User = get_user_model()  # Get the custom user model
 
@@ -710,3 +710,36 @@ def get_favorite_businesses(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)  
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def get_favorite_businesses(request):
+    pass
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def get_followers(request):
+    user = request.user
+    followers = Follow.objects.filter(following=user)
+    data = []
+    for f in followers:
+        data.append({
+            'id': f.follower.id,
+            'username': f.follower.username,
+        })
+
+    return JsonResponse({'followers': data})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def get_following(request):
+    user = request.user
+    following = Follow.objects.filter(follower=user)
+    data = []
+    for f in following:
+        data.append({
+            'id': f.following.id,
+            'username': f.following.username,
+        })
+
+    return JsonResponse({'following': data})
