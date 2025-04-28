@@ -899,11 +899,14 @@ def follow_user(request):
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
 
-        if Follow.objects.filter(follower=user, following=user_to_follow).exists():
-            return JsonResponse({'message': 'Already following'}, status=400)
+        follow_relation = Follow.objects.filter(follower=user, following=user_to_follow)
 
-        Follow.objects.create(follower=user, following=user_to_follow)
-        return JsonResponse({'message': f'Now following {user_to_follow.username}'})
+        if follow_relation.exists():
+            follow_relation.delete()
+            return JsonResponse({'message': f'Unfollowed {user_to_follow.username}'})
+        else:
+            Follow.objects.create(follower=user, following=user_to_follow)
+            return JsonResponse({'message': f'Now following {user_to_follow.username}'})
 
-    except:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)

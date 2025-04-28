@@ -34,6 +34,7 @@ from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, favorate_business
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState, Follow
 from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
+from .models import Product_business_invoice
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -713,8 +714,39 @@ def get_favorite_businesses(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])  # Anyone can scan the QR
-def get_favorite_businesses(request):
-    pass
+def history_product_business_invoice(request):
+    try:
+        user = request.user
+        if user.role == 'business':
+
+            try:
+                business = BusinessVerifications.objects.get(business= user)
+                products = Product_business_invoice.objects.filter(business= business)
+                all_data = []
+                for product in products:
+                    all_data.append( {
+                        'id' : product.id,
+                        'user_id' : product.user.id,
+                        'business_id' : product.business.id,
+                        'product_service' : product.product_service,
+                        'invoice_amount' : product.invoice_amount,
+                        'reviewcashback' : product.reviewcashback,
+                        'refferial_code' : product.refferial_code,
+                        'client_name' : product.client_name,
+                        'client_phone' : product.client_phone,
+                        'client_email' : product.client_email
+                    })
+                    
+            
+                return JsonResponse(all_data, safe=False, status=200)
+            except:
+                return JsonResponse({'error':'data is not find'}, status=404)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])  # Anyone can scan the QR
@@ -743,3 +775,43 @@ def get_following(request):
         })
 
     return JsonResponse({'following': data})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def get_user(request):
+    try:
+        category_user = CategoryUsers.objects.all()
+      
+        data = []
+        for user in category_user:
+            img = ''
+            if user.role == 'user':
+                try:
+                    user_detail = UserDetail.objects.get(business=user) 
+                    try:
+                        img = user_detail.profile_image.url
+                    except:
+                        img = ''
+                except:
+                    img = ''
+            if user.role == 'business' :
+                try:
+                    business_detail = Businessdetail.objects.get(business=user) 
+                    image = business_detail.business_image.get()  
+                    img = image.image.url
+                except:
+                    img = ''
+
+            data.append({
+                'id': user.id,
+                'username': user.name,
+                'image' : img ,
+                'role' : user.role
+            })
+
+        return JsonResponse({'user': data})
+    
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

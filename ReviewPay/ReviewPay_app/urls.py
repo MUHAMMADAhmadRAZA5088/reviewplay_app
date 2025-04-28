@@ -12,6 +12,7 @@ urlpatterns = [
     path('reviewpayrole_api/get_following/', get_api_views.get_following, name='get_following'),
 
     # product_business_request_api
+    path('reviewpayrole_api/product_invoice_history/', get_api_views.history_product_business_invoice,name='history_product_business_invoice'),
     path('reviewpayrole_api/product_client_review/', api_views.product_client_review, name='product_client_review'),
     path('reviewpayrole_api/product_business_invoice/', api_views.product_business_invoice, name='product_business_invoice'),
     # email send api
@@ -75,6 +76,7 @@ urlpatterns = [
     path('reviewpayrole_api/business/employee_detail', api_views.employee_detail, name='employee_detail'),
     path('reviewpayrole_api/business/business_detail', api_views.create_or_update_business_detail, name='business_detail'),
     # businesses api
+    path('reviewpayrole_api/get_user/',get_api_views.get_user, name='get_user'),
     path('reviewpayrole_api/business/business_verification', api_views.business_verifications, name='business_verification'),   
     path('reviewpayrole_api/business/get_business_verification', get_api_views.get_business_verification, name='business_verification'),     
     path('reviewpayrole_api/signup/', api_views.api_signup, name='api_signup'),
