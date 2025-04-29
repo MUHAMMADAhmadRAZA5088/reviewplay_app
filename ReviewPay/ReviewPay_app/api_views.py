@@ -754,6 +754,220 @@ def dissmise_notification(request):
                 'business_verify_date':notification.business_verify_date
                 }, safe=False, status=200)
 
+def send_email_review(email,name):
+    try:
+        with open('/home/ubuntu/email_send/email_key.json', 'r') as file:
+            data = json.load(file)
+    except:
+        with open('C:\\bravo\email_key.json', 'r') as file:
+            data = json.load(file)   
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = data["key"]
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    subject = "feed back"
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    html_content = f"""
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Signature</title>
+  <style>
+    @font-face {{
+      font-family: 'GeneralSansBold';
+      src: url('path-to-font/GeneralSansBold.woff2') format('woff2');
+    }}
+    @font-face {{
+      font-family: 'GeneralSansMedium';
+      src: url('path-to-font/GeneralSansMedium.woff2') format('woff2');
+    }}
+    @font-face {{
+      font-family: 'GeneralSansRegular';
+      src: url('path-to-font/GeneralSansRegular.woff2') format('woff2');
+    }}
+    @font-face {{
+      font-family: 'VerminViva';
+      src: url('path-to-font/VerminViva.woff2') format('woff2');
+    }}
+
+    body {{
+      margin: 0;
+      padding: 0;
+      font-family: 'GeneralSansRegular', sans-serif;
+    }}
+
+    .container {{
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }}
+
+    .banner-section {{
+      height: 288px;
+      width: 100%;
+    }}
+
+    .banner-image {{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }}
+
+    .content-section {{
+      width: 100%;
+      background-color: #B7BDCA;
+      padding: 32px;
+      box-sizing: border-box;
+    }}
+
+    .heading {{
+      font-family: 'GeneralSansBold', sans-serif;
+      font-size: 30px;
+      color: black;
+      text-align: center;
+      margin-bottom: 28px;
+    }}
+
+    .horizontal-line {{
+      width: 100%;
+      height: 2px;
+      background-color: black;
+      margin-bottom: 40px;
+    }}
+
+    .refer-text {{
+      font-family: 'GeneralSansMedium', sans-serif;
+      font-size: 30px;
+      text-align: center;
+      color: #0D182E;
+      margin-bottom: 40px;
+    }}
+
+    .cashback-text {{
+      text-align: center;
+      font-family: 'GeneralSansMedium', sans-serif;
+      color: #0D182E;
+      margin-bottom: 40px;
+      margin-top: 20px;
+    }}
+
+    .footer {{
+      text-align: center;
+    }}
+
+    .logo-container {{
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }}
+
+    .company-logo {{
+      height: 80px;
+      width: auto;
+    }}
+
+    .company-name {{
+      font-family: 'VerminViva', sans-serif;
+      font-size: 24px;
+      color: #0D182E;
+      margin-bottom: 8px;
+    }}
+
+    .disclaimer {{
+      font-family: 'GeneralSansRegular', sans-serif;
+      color: black;
+      text-align: center;
+      margin-bottom: 16px;
+    }}
+
+    .social-icons {{
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }}
+
+    .social-icon {{
+      width: 20px;
+      height: 20px;
+    }}
+
+    .address {{
+      font-size: 14px;
+      font-family: 'GeneralSansRegular', sans-serif;
+      color: black;
+    }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Banner Section -->
+    <div class="banner-section">
+      <img src="https://reviewpay.com.au/static/media/emailbanner.52ea48d6eff86503dfbb.jpeg" alt="Email Signature Header" class="banner-image">
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="content-section">
+      <!-- Heading -->
+      <h1 class="heading">Thank you Rita for your review!</h1>
+
+      <!-- Horizontal Line -->
+      <div class="horizontal-line"></div>
+
+      <!-- Refer Now and Earn Text -->
+      <h2 class="refer-text">Refer now and Earn</h2>
+
+      <!-- Refer a Friend Text -->
+      <p class="cashback-text">Refer a friend and earn 9% cash back</p>
+
+      <div class="horizontal-line"></div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <!-- Company Logo -->
+        <div class="logo-container">
+          <img src="data:image/png;base64,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" alt="Company Logo" class="company-logo">
+        </div>
+
+        <!-- Company Name -->
+        <h2 class="company-name">Review Pay</h2>
+
+        <p class="disclaimer">
+          You are receiving this email because you opted in via our website.
+        </p>
+
+        <!-- Social Media Icons -->
+        <div class="social-icons">
+          <a href="#"><img src="assets/images/ii1.png" alt="YouTube" class="social-icon"></a>
+          <a href="#"><img src="assets/images/ii2.png" alt="Dribble" class="social-icon"></a>
+          <a href="#"><img src="assets/images/ii3.png" alt="Twitter" class="social-icon"></a>
+          <a href="#"><img src="assets/images/ii4.png" alt="Instagram" class="social-icon"></a>
+          <a href="#"><img src="assets/images/ii5.png" alt="LinkedIn" class="social-icon"></a>
+        </div>
+
+        <!-- Company Address -->
+        <p class="address">
+          123 Review Street, Tech City, Innovation District 12345
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>"""
+    sender = {"name":"ahsan","email":"hello@reviewpay.com.au"}
+    to = [{"email": email,"name": name}]
+    headers = {"Some-Custom-Name":"unique-id-1234"}
+    params = {"parameter":"My param value","subject":"New Subject"}
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers, html_content=html_content, sender=sender, subject=subject)
+
+    try:
+        api_response = api_instance.send_transac_email(send_smtp_email)
+        return "sucess"
+    except:
+        return "false"
+
+
 
 def send_email(email ,name ,phone ,client_id ,product_id,business_id):
     try:
@@ -768,7 +982,7 @@ def send_email(email ,name ,phone ,client_id ,product_id,business_id):
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     subject = "Reviewpay product invoice"
     html_content = f"<html><body><h1>Thank you for your purchase!</h1><p>Dear Customer,</p>{website_url}<p></p> </body></html>"
-    sender = {"name":"Robert","email":"hello@reviewpay.com.au"}
+    sender = {"name":"ahmad","email":"hello@reviewpay.com.au"}
     to = [{"email": email,"name": name}]
     headers = {"Some-Custom-Name":"unique-id-1234"}
     params = {"parameter":"My param value","subject":"New Subject"}
@@ -878,7 +1092,12 @@ def product_client_review(request):
         if project_review_client:
             product.status = "approve" 
             product.save
-            return JsonResponse({"massage":"approve data successfully"}, status = 200)
+            email_status = send_email_review(user.username,user.name)
+            if email_status == "sucess":
+                return JsonResponse({"massage":f"create sucessfully invoice and send email {user.name}."}, status = 200)
+            else:
+                return JsonResponse({"massage":"create sucessfully invoice and not send email."}, status = 403)
+            
     except KeyError as e:
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
