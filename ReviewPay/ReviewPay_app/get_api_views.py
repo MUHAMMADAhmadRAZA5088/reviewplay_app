@@ -780,34 +780,36 @@ def get_following(request):
 @permission_classes([IsAuthenticated])  # Anyone can scan the QR
 def get_user(request):
     try:
+        current_user = request.user
         category_user = CategoryUsers.objects.all()
-      
         data = []
         for user in category_user:
             img = ''
-            if user.role == 'user':
-                try:
-                    user_detail = UserDetail.objects.get(business=user) 
+            
+            if user.id != current_user.id:
+                if user.role == 'user':
                     try:
-                        img = user_detail.profile_image.url
+                        user_detail = UserDetail.objects.get(business=user) 
+                        try:
+                            img = user_detail.profile_image.url
+                        except:
+                            img = ''
                     except:
                         img = ''
-                except:
-                    img = ''
-            if user.role == 'business' :
-                try:
-                    business_detail = Businessdetail.objects.get(business=user) 
-                    image = business_detail.business_image.get()  
-                    img = image.image.url
-                except:
-                    img = ''
+                if user.role == 'business' :
+                    try:
+                        business_detail = Businessdetail.objects.get(business=user) 
+                        image = business_detail.business_image.get()  
+                        img = image.image.url
+                    except:
+                        img = ''
 
-            data.append({
-                'id': user.id,
-                'username': user.name,
-                'image' : img ,
-                'role' : user.role
-            })
+                data.append({
+                    'id': user.id,
+                    'username': user.name,
+                    'image' : img ,
+                    'role' : user.role
+                })
 
         return JsonResponse({'user': data})
     
