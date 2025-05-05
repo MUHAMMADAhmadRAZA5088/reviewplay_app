@@ -36,7 +36,7 @@ from django.contrib.auth.models import User
 from .models import CategoryUsers, Businessdetail, Employee, Product, Product_business_invoice
 from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business, Follow
 from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user, ProductClientReview
-from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking
+from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking,NotificationMassage
 from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications
 User = get_user_model()  # Get the custom user model
 
@@ -1029,6 +1029,7 @@ def product_business_invoice(request):
             data = request.POST
             user_simple = CategoryUsers.objects.get(email= data.get('client_email'))
             business = BusinessVerifications.objects.get(business= user)
+            notification_business = CategoryUsers.objects.get(email=business.business) 
             if data.get('product_service') != '' and data.get('client_email') != '':
                 product_service = data.get('product_service')
                 invoice_amount = data.get('invoice_amount')
@@ -1050,8 +1051,16 @@ def product_business_invoice(request):
                 )
                 
                 email_status = send_email(client_email,client_name,client_phone,user_simple.id,product.id,business.id)
+                try:
+                    notification =  NotificationMassage.objects.create(
+                        user = user_simple,
+                        notification = f"Got a minute? {notification_business.name} would love to hear your thoughts. Please complete their review form."
+                    )
+                except:
+                    return JsonResponse({"massage":"Notification Error"}, status = 403)
+                
                 if email_status == "sucess":
-                    return JsonResponse({"massage":f"create sucessfully invoice and send email {client_email}."}, status = 200)
+                    return JsonResponse({"massage":f"create sucessfully invoice and send email {client_email}.","notification" : notification.notification}, status = 200)
                 else:
                     return JsonResponse({"massage":"create sucessfully invoice and not send email."}, status = 403)
         else:
@@ -1071,6 +1080,7 @@ def product_client_review(request):
         user_simple = CategoryUsers.objects.get(id = user.id)
         product = Product_business_invoice.objects.get(id= data["product_id"]) 
         business = BusinessVerifications.objects.get(id= data["business_id"])
+        notification_business = CategoryUsers.objects.get(email=business.business) 
         project_review_client = ProductClientReview.objects.create(
         product_id = product,
         user = user_simple,
@@ -1093,8 +1103,16 @@ def product_client_review(request):
             product.status = "approve" 
             product.save
             email_status = send_email_review(user.username,user.name)
+            try:
+                notification =  NotificationMassage.objects.create(
+                    user = notification_business,
+                    notification = f"Great news! {user.name} has submitted their review for your business."
+                )
+            except:
+                return JsonResponse({"massage":"Notification Error"}, status = 403)
+
             if email_status == "sucess":
-                return JsonResponse({"massage":f"create sucessfully invoice and send email {user.name}."}, status = 200)
+                return JsonResponse({"massage":f"create sucessfully invoice and send email {user.name}.","notification_id": notification.id,"notification":notification.notification,"created_date" : notification.created_at, "updated_date": notification.updated_at}, status = 200)
             else:
                 return JsonResponse({"massage":"create sucessfully invoice and not send email."}, status = 403)
             
@@ -1112,7 +1130,7 @@ def follow_user(request):
     try:
         data = request.POST
         user_id_to_follow = data['user_id']
-
+        
         try:
             user_to_follow = User.objects.get(id=user_id_to_follow)
         except User.DoesNotExist:
@@ -1124,8 +1142,39 @@ def follow_user(request):
             follow_relation.delete()
             return JsonResponse({'message': f'Unfollowed {user_to_follow.username}'})
         else:
+            
+            follow_user = Follow.objects.filter(follower = user_to_follow, following = user)
+
+            if follow_user :
+                massage = f"{user_to_follow.name} has followed you back"
+            else :
+                massage = f"{user_to_follow.name} has starting following you"
+
+            notification =  NotificationMassage.objects.create(
+                user = user_to_follow,
+                notification = massage
+            )
             Follow.objects.create(follower=user, following=user_to_follow)
-            return JsonResponse({'message': f'Now following {user_to_follow.username}'})
+
+            return JsonResponse({'message': f'Now following {user_to_follow.username}',"follow massage" : massage})
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def post_massagenotification(request):
+    user = request.user
+    data = request.POST
+    try:
+        notification =  NotificationMassage.objects.create(
+                user = user,
+                notification = data["notification"]
+        )
+        return JsonResponse({"massage":f"create sucessfully.","notification_id" : notification.id}, status = 200)
+    
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

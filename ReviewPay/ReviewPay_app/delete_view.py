@@ -24,7 +24,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee,favorate_business
-from .models import Product, UserDetail, Feedback,  Product, ProductImage, Barcode
+from .models import Product, UserDetail, Feedback,  Product, ProductImage, Barcode, NotificationMassage
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -65,6 +65,20 @@ def delete_favorite_business(request, slug=None):
   # Replace `id` with slug if necessary
         else:
             return JsonResponse({'error': 'Product ID or slug is required.'}, status=400)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)  
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def delete_notification(request, slug):
+    try:
+        user = request.user
+        notification = NotificationMassage.objects.filter(id=int(slug),user = user)
+        notification.delete()
+        return JsonResponse({'message': 'notification deleted successfully.'}, status=200)
 
     except KeyError as e:
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)

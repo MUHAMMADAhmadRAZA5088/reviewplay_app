@@ -34,7 +34,7 @@ from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, favorate_business
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState, Follow
 from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
-from .models import Product_business_invoice
+from .models import Product_business_invoice, NotificationMassage
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -813,6 +813,38 @@ def get_user(request):
 
         return JsonResponse({'user': data})
     
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def get_notification_all(request,slug = None):
+    user = request.user
+
+    try:
+        if slug:
+            notifications = NotificationMassage.objects.filter(user = user)
+            for notification in notifications:
+                if notification.id == int(slug):
+                    return JsonResponse({ "id": notification.id, "notification" : notification.notification, "created_date" : notification.created_at, "updated_date": notification.updated_at }, safe=False, status=200)
+
+        else: 
+            notifications = NotificationMassage.objects.filter(user = user)
+            all_notification = []
+            for notification in notifications:
+                all_notification.append(
+                    {
+                        "id": notification.id,
+                        "notification" : notification.notification,
+                        "created_date" : notification.created_at,
+                        "updated_date": notification.updated_at
+
+                    }
+                    )
+            return JsonResponse(all_notification, safe=False, status=200)
+
     except KeyError as e:
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:

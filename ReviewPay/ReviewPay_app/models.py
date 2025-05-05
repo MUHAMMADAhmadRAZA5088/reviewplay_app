@@ -269,7 +269,6 @@ class Welcome_new_user(models.Model):
     user =  models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name='new_user')
     email = models.EmailField()
 
-
 class favorate_business(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name='favorite_businesses')
     business = models.ForeignKey(Businessdetail, on_delete=models.CASCADE, related_name='favorited_by')
@@ -332,3 +331,8 @@ class Follow(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class NotificationMassage(models.Model):
+    user =  models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name='notification')
+    notification = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)  # set on create
+    updated_at = models.DateTimeField(auto_now=True)      # update on every save

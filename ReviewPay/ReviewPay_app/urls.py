@@ -5,7 +5,11 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views, api_views, get_api_views, delete_view, google_view, email_view
 
 urlpatterns = [
-
+    # notificationmassage
+    path('reviewpayrole_api/add_notificationmassage/' , api_views.post_massagenotification, name='post_massage_notification'),
+    path('reviewpayrole_api/notificationmassage/' , get_api_views.get_notification_all, name='massage_notification'),
+    path('reviewpayrole_api/notificationmassage/<int:slug>/',get_api_views.get_notification_all, name="get_products_with_id"),
+    path('reviewpayrole_api/delete_notificationmassage/<int:slug>/',delete_view.delete_product, name="delete_notificationmassage"),
     # follow/follower/following
     path('reviewpayrole_api/follow_user/', api_views.follow_user, name='follow'),
     path('reviewpayrole_api/get_followers/', get_api_views.get_followers, name='follower'),
