@@ -37,7 +37,7 @@ from .models import CategoryUsers, Businessdetail, Employee, Product, Product_bu
 from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business, Follow
 from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user, ProductClientReview
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking,NotificationMassage
-from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications
+from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications, UserSession
 User = get_user_model()  # Get the custom user model
 
 
@@ -1178,3 +1178,25 @@ def post_massagenotification(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+@csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def track_user_time(request):
+    user = request.user
+    try:
+        duration = request.data.get('duration')
+
+        if duration is None:
+            return Response({'error': 'Duration is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        UserSession.objects.create(
+            user=user,
+            duration=float(duration),
+            timestamp=now()
+        )
+
+        return Response({'message': 'Session time saved successfully.'}, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

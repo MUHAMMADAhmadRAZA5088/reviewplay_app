@@ -336,3 +336,8 @@ class NotificationMassage(models.Model):
     notification = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)  # set on create
     updated_at = models.DateTimeField(auto_now=True)      # update on every save
+
+class UserSession(models.Model):
+    user = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE)
+    duration = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)

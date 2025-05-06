@@ -8,7 +8,7 @@ from .models import BusinessState, ProductImage, Barcode, UserDetail, favorate_b
 from .models import Feedback, BusinessVerifications,CommingsoonLogin,Welcome_new_user
 from .models import BusinessLogo,BusinessVideo,BusinessImage,ReviewCashback,Notifications
 from .models import ReferralCashback,ReferralCashback, UserCashBack, OrderTracking,QRScan
-from .models import Follow, ProductClientReview
+from .models import Follow, ProductClientReview, UserSession
 #BusinessImage, BusinessVideo
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -465,6 +465,21 @@ class FollowAdmn(admin.ModelAdmin):
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
 
+class UserSessionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'duration', 'timestamp')
+        # Custom column for delete
+    def delete_option(self, obj):
+        delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
+        return format_html(
+             '<button class="admin_btn-primary"><a style="text-decoration: none;color: #fff;" href="{}">Delete</a></button>',
+            delete_url
+        )
+        class Media:
+            css = {
+                'all': ('css/custom.css',)  # Ensure correct static path
+            }
+
+admin.site.register(UserSession ,UserSessionAdmin)
 admin.site.register(ProductClientReview ,ProductClientReviewAdmn)
 admin.site.register(Follow ,FollowAdmn)
 admin.site.register(Product_business_invoice, Product_business_invoiceAdmin)  
