@@ -6,6 +6,7 @@ from . import views, api_views, get_api_views, delete_view, google_view, email_v
 
 urlpatterns = [
     # tracker time
+    path('reviewpayrole_api/tracker/', get_api_views.get_time, name='tracker'),
     path('reviewpayrole_api/track-time/', api_views.track_user_time, name='track_user_time'),
     # notificationmassage
     path('reviewpayrole_api/add_notificationmassage/' , api_views.post_massagenotification, name='post_massage_notification'),
@@ -95,6 +96,5 @@ urlpatterns = [
     # FaceBook Login
     path('api/auth/social/facebook', google_view.FacebookLogin.as_view(), name='facebook_login'),
     # logout 
-
     path('logout/', api_views.LogoutView.as_view(), name='logout'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

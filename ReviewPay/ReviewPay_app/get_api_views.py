@@ -34,7 +34,7 @@ from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, favorate_business
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState, Follow
 from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
-from .models import Product_business_invoice, NotificationMassage
+from .models import Product_business_invoice, NotificationMassage, UserSession
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -849,3 +849,25 @@ def get_notification_all(request,slug = None):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def get_time(request):
+    
+    user = request.user
+    try:
+        data = []
+        times = UserSession.objects.filter(user=user)
+        for time in times:
+            data.append({
+                "id": time.id,
+                "user_id": time.user_id,
+                "duration": time.duration,
+                "created_at": time.timestamp,
+
+            })
+        
+        return JsonResponse(data, safe=False, status=200)
+    except:
+        return JsonResponse({'error': 'Error'}, status=500)
