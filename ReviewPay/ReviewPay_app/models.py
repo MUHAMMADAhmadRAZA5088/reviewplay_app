@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.timezone import now
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+from datetime import timedelta
 
 class CategoryUsers(AbstractUser):
     # Custom fields for normal users
@@ -339,5 +339,5 @@ class NotificationMassage(models.Model):
 
 class UserSession(models.Model):
     user = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE)
-    duration = models.FloatField()
+    duration = models.DurationField(default=timedelta(0))
     timestamp = models.DateTimeField(auto_now_add=True)

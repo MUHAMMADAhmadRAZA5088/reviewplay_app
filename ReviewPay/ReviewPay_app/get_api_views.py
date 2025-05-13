@@ -863,7 +863,7 @@ def get_time(request):
             data.append({
                 "id": time.id,
                 "user_id": time.user_id,
-                "duration": time.duration,
+                "duration": str(time.duration),
                 "created_at": time.timestamp,
 
             })

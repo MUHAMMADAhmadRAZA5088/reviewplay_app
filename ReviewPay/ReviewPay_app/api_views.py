@@ -4,6 +4,7 @@ import time
 import base64
 import os
 from decimal import Decimal
+from datetime import timedelta
 from uuid import uuid4
 import time
 import sib_api_v3_sdk
@@ -1185,17 +1186,21 @@ def post_massagenotification(request):
 def track_user_time(request):
     user = request.user
     try:
-        duration = request.data.get('duration')
+        duration_str = request.data.get('duration')
 
-        if duration is None:
-            return Response({'error': 'Duration is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if duration_str is None:
+            return Response({'error': 'Duration is required. Format: HH:MM:SS'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            hours, minutes, seconds = map(int, duration_str.split(':'))
+            duration = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+        except ValueError:
+            return Response({"error": "Invalid duration format. Use HH:MM:SS"}, status=status.HTTP_400_BAD_REQUEST)
 
-        UserSession.objects.create(
-            user=user,
-            duration=float(duration),
-            timestamp=now()
+        entry, created = UserSession.objects.update_or_create(
+            user=request.user,
+            defaults={'duration': duration if duration else timedelta(0)}  # Default time if no duration provided
         )
-
         return Response({'message': 'Session time saved successfully.'}, status=status.HTTP_201_CREATED)
 
     except Exception as e:
