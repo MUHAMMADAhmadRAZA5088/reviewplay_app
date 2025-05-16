@@ -18,7 +18,7 @@ class CategoryUsersAdmin(UserAdmin):
     model = CategoryUsers
 
     # Fields to display in list view
-    list_display = ('id','name', 'email', 'role', 'delete_option')
+    list_display = ('id','name', 'referral_code' ,'email', 'role', 'delete_option')
 
     # Fields to filter
     list_filter = ('role',)

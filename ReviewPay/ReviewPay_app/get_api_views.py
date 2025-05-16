@@ -34,7 +34,7 @@ from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, favorate_business
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState, Follow
 from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
-from .models import Product_business_invoice, NotificationMassage, UserSession
+from .models import Product_business_invoice, NotificationMassage, UserSession, refferial_code
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -871,3 +871,19 @@ def get_time(request):
         return JsonResponse(data, safe=False, status=200)
     except:
         return JsonResponse({'error': 'Error'}, status=500)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Anyone can scan the QR
+def get_total_refferial(request):
+    user = request.user
+    code = user.referral_code
+
+    refferials = refferial_code.objects.filter(refferial_code = code)
+    data = []
+    for refferial in refferials:
+        data.append( {
+            "email" : refferial.user_email,
+            "refferial_code" : refferial.refferial_code,
+        })
+    return JsonResponse(data, safe=False, status=200)
+

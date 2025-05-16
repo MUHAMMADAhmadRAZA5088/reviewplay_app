@@ -38,7 +38,7 @@ from .models import CategoryUsers, Businessdetail, Employee, Product, Product_bu
 from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business, Follow
 from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user, ProductClientReview
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking,NotificationMassage
-from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications, UserSession
+from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications, UserSession, refferial_code
 User = get_user_model()  # Get the custom user model
 
 
@@ -66,7 +66,8 @@ def api_signup(request):
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirmPassword')
         role = request.POST.get('role')
-        
+        referral_code = request.POST.get('referral_code')
+      
         # Validation for required fields
         if not name or not email or not password:
             return JsonResponse({'error': 'Username, email, and password are required'}, status=400)
@@ -87,9 +88,16 @@ def api_signup(request):
                     role=role
                 )
                 user.save()
-
                 if role == 'business':
                     Notifications.objects.create(user_id=user)
+             
+                if referral_code:
+                 
+                    referral = refferial_code.objects.create(
+                        user_email = email,
+                        refferial_code = referral_code
+                                                            )
+                    referral.save()
                 return JsonResponse({'message': 'User added successfully'}, status=201)
             except Exception as e:
                 return JsonResponse({'error': 'Email already exists'}, status=400)
@@ -1197,11 +1205,18 @@ def track_user_time(request):
         except ValueError:
             return Response({"error": "Invalid duration format. Use HH:MM:SS"}, status=status.HTTP_400_BAD_REQUEST)
 
-        entry, created = UserSession.objects.update_or_create(
-            user=request.user,
-            defaults={'duration': duration if duration else timedelta(0)}  # Default time if no duration provided
-        )
+        entry, created = UserSession.objects.update_or_create(user=request.user, defaults={'duration': duration if duration else timedelta(0)}  )
         return Response({'message': 'Session time saved successfully.'}, status=status.HTTP_201_CREATED)
 
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def referral_referrel_request(request):
+    user = request.user
+    code = user.referral_code
+    url = f"https://reviewpay.com.au/CreateAccountU?code={code}"
+    return JsonResponse({'refferal_url': url}, status=200)
+    

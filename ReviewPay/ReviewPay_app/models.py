@@ -1,4 +1,5 @@
 import secrets
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.timezone import now
@@ -12,7 +13,15 @@ class CategoryUsers(AbstractUser):
         ('business', 'Business User'),
     ]
     name = models.CharField(max_length=50)
+    referral_code = models.CharField(max_length=20, blank=True, null=True, unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES,default="admin user")
+
+    def save(self, *args, **kwargs):
+        if not self.referral_code:
+            
+            self.referral_code = str(uuid.uuid4())[:8]
+        super().save(*args, **kwargs)
+
 
 
 class OrderTracking(models.Model):
@@ -341,3 +350,7 @@ class UserSession(models.Model):
     user = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE)
     duration = models.DurationField(default=timedelta(0))
     timestamp = models.DateTimeField(auto_now_add=True)
+
+class refferial_code(models.Model):
+    user_email = models.CharField(max_length=255)
+    refferial_code = models.CharField(max_length=255)
