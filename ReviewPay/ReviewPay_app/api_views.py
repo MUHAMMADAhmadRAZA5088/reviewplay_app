@@ -1216,7 +1216,13 @@ def track_user_time(request):
 @permission_classes([IsAuthenticated])
 def referral_referrel_request(request):
     user = request.user
-    code = user.referral_code
-    url = f"https://reviewpay.com.au/CreateAccountU?code={code}"
-    return JsonResponse({'refferal_url': url}, status=200)
-    
+    try:
+        if user.role == 'user':
+            code = user.referral_code
+            url = f"https://reviewpay.com.au/CreateAccountU?code={code}"
+            return JsonResponse({'refferal_url': url}, status=200)
+        
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
