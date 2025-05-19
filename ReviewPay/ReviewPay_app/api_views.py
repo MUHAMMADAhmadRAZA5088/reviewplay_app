@@ -1221,6 +1221,8 @@ def referral_referrel_request(request):
             code = user.referral_code
             url = f"https://reviewpay.com.au/CreateAccountU?code={code}"
             return JsonResponse({'refferal_url': url}, status=200)
+        else:
+            return JsonResponse({'error': 'You are not a user'}, status=400)
         
     except KeyError as e:
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
