@@ -3,6 +3,7 @@ import threading
 import time
 import base64
 import os
+import uuid
 from decimal import Decimal
 from datetime import timedelta
 from uuid import uuid4
@@ -1212,14 +1213,16 @@ def track_user_time(request):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def referral_referrel_request(request):
     user = request.user
+    data = request.POST
+    business_id = data.get('business_id')
     try:
         if user.role == 'user':
             code = user.referral_code
-            url = f"https://reviewpay.com.au/CreateAccountU?code={code}"
+            url = f"https://reviewpay.com.au/UserDashboard/BusinessCategories?code={code}&business_id={business_id}"
             return JsonResponse({'refferal_url': url}, status=200)
         else:
             return JsonResponse({'error': 'You are not a user'}, status=400)
