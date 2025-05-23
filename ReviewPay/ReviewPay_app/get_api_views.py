@@ -537,7 +537,26 @@ def get_business_detail_one(request, Business_id):
         videos = business_detail.business_video.all()
         logos = business_detail.business_logo.all() 
         images = business_detail.business_image.all()
-
+        try:
+            business_verification = BusinessVerifications.objects.get(business= business_detail.business) 
+        except:
+            business_verification = None
+        verification = {}
+        if business_verification:
+            verification = {
+                    'id': business_verification.id,
+                    'business_web': business_verification.business_web,
+                    'ACN' : business_verification.ACN,
+                    'fullname_director_1' : business_verification.fullname_director_1,
+                    'fullname_director_2' : business_verification.fullname_director_2,
+                    'admin_phone_number' : business_verification.admin_phone_number,
+                    'business_phone_number' : business_verification.business_phone_number,
+                    'facebook_link' : business_verification.facebook_link,
+                    'instagram_link' : business_verification.instra_link,
+                    'admin_email' : business_verification.admin_email,
+                    'client_email' : business_verification.client_email,
+                    'openning_hours' : business_verification.openning_hours,
+                }
     except:
         return JsonResponse({'error':'data is not find'}, status=404)
 
@@ -564,6 +583,7 @@ def get_business_detail_one(request, Business_id):
                                         "referral_amount_cashback_fixed", "referral_cashback_return_refund_period",
                                         "referral_cashback_expiry"
                 )),
+                "verification": verification
                 }
 
         # Return the data as JSON
