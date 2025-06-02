@@ -323,7 +323,7 @@ def user_detail(request):
                 'x-api-key': 'sandbox_sk_pr_bcaf7e2c9d295a2039f27416113d2a00de0ce95e'
             }
             payload = {
-                'bg_color': '#0000FF'
+                'bg_color': '#FF0000'
             }
             files = [
                 ('image_file', (image.name, image.read(), 'application/octet-stream'))
