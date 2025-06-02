@@ -1,4 +1,4 @@
-import json
+import json, requests
 import threading
 import time
 import base64
@@ -315,20 +315,43 @@ def user_detail(request):
             file_extension = os.path.splitext(image.name)[1]  # Get file extension (e.g., .jpg, .png)
             new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
             image.name = new_file_name  # Assign the new name
-            # Check if required data is present
+
+            # Step 1: Call PhotoRoom API to remove/change background
+            photoroom_url = "https://sdk.photoroom.com/v1/segment"
+            headers = {
+                'Accept': 'image/png, application/json',
+                'x-api-key': 'sandbox_sk_pr_bcaf7e2c9d295a2039f27416113d2a00de0ce95e'
+            }
+            payload = {
+                'bg_color': '#0000FF'
+            }
+            files = [
+                ('image_file', (image.name, image.read(), 'application/octet-stream'))
+            ]
+
+            response = requests.post(photoroom_url, headers=headers, data=payload, files=files)
+    
+            if 'image/png' not in response.headers.get('Content-Type', ''):
+                return JsonResponse({'error': 'PhotoRoom API failed.', 'details': response.text}, status=500)
+            
+            # Step 2: Save the returned image (as profile_image)
+            output_image = ContentFile(response.content, name=new_file_name)
+
+            # Step 3: Update or create user detail
             user_detail, created = UserDetail.objects.update_or_create(
-                                    business = user,
-                                    defaults = {
-                                     'first_name' : request.POST.get('first_name'),
-                                     'last_name' : request.POST.get('last_name'),
-                                     'email' : request.POST.get('email'),
-                                     'gender' : request.POST.get('gender'),
-                                     'phone_number' : request.POST.get('phone_number'),
-                                     'post_code' : request.POST.get('post_code'),
-                                     'date_of_birth' : datetime.strptime(request.POST.get('date_of_birth'), '%d-%m-%Y').date(),                                     
-                                     'profile_image' : image
-                                    })
-        
+                business=user,
+                defaults={
+                    'first_name': request.POST.get('first_name'),
+                    'last_name': request.POST.get('last_name'),
+                    'email': request.POST.get('email'),
+                    'gender': request.POST.get('gender'),
+                    'phone_number': request.POST.get('phone_number'),
+                    'post_code': request.POST.get('post_code'),
+                    'date_of_birth': datetime.strptime(request.POST.get('date_of_birth'), '%d-%m-%Y').date(),
+                    'profile_image': output_image
+                }
+            )
+
             if created:
                 message = 'User Detail data added successfully.'
             else:
@@ -1189,6 +1212,7 @@ def post_massagenotification(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
+
 @csrf_exempt  # Exempt CSRF for Postman testing; remove this in production
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
