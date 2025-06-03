@@ -323,19 +323,28 @@ def user_detail(request):
                 'x-api-key': 'sandbox_sk_pr_bcaf7e2c9d295a2039f27416113d2a00de0ce95e'
             }
             payload = {
-                'bg_color': '#FF0000'
             }
             files = [
                 ('image_file', (image.name, image.read(), 'application/octet-stream'))
             ]
-
+            response_1 = requests.post(photoroom_url, headers=headers, data=payload, files=files)
+            try:
+                color = request.POST.get('bg_color')
+            except:
+                color = ''
+            if color != '':
+                payload['bg_color'] = color
             response = requests.post(photoroom_url, headers=headers, data=payload, files=files)
     
-            if 'image/png' not in response.headers.get('Content-Type', ''):
+            if 'image/png' not in response_1.headers.get('Content-Type', ''):
                 return JsonResponse({'error': 'PhotoRoom API failed.', 'details': response.text}, status=500)
             
+            if 'image/png' not in response.headers.get('Content-Type', ''):
+                return JsonResponse({'error': 'PhotoRoom API failed.', 'details': response.text}, status=500)  
+                   
             # Step 2: Save the returned image (as profile_image)
-            output_image = ContentFile(response.content, name=new_file_name)
+            output_image = ContentFile(response_1.content, name=new_file_name)
+            output_image_1 = ContentFile(response.content, name=new_file_name)
 
             # Step 3: Update or create user detail
             user_detail, created = UserDetail.objects.update_or_create(
@@ -348,7 +357,8 @@ def user_detail(request):
                     'phone_number': request.POST.get('phone_number'),
                     'post_code': request.POST.get('post_code'),
                     'date_of_birth': datetime.strptime(request.POST.get('date_of_birth'), '%d-%m-%Y').date(),
-                    'profile_image': output_image
+                    'profile_image': output_image,
+                    'profile_image_color': output_image_1
                 }
             )
 

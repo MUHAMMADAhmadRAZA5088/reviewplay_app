@@ -176,6 +176,7 @@ class UserDetail(models.Model):
     phone_number = models.CharField(max_length=255)
     post_code = models.CharField(max_length=10, default='00000')
     profile_image = models.ImageField(upload_to='user_images/', blank=True, null=True)
+    profile_image_color = models.ImageField(upload_to='user_images/', blank=True, null=True)
     class Meta:
         verbose_name = "User Detail"
         verbose_name_plural = "User Details"  # Plural Form

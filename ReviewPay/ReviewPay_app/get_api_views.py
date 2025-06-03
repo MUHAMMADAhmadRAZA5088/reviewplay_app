@@ -54,6 +54,7 @@ def get_user_detail(request):
                 'gender': user_detail.gender,
                 'date_of_birth': user_detail.date_of_birth,
                 'profile_image': 'https://superadmin.reviewpay.com.au' + user_detail.profile_image.url if user_detail.profile_image else None,  # Check if profile_image exists
+                'profile_image_color' : 'https://superadmin.reviewpay.com.au' + user_detail.profile_image_color.url if user_detail.profile_image_color else None,
                 'phone_number': user_detail.phone_number,
                 'post_code' : user_detail.post_code,
             }
