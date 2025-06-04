@@ -320,7 +320,7 @@ def user_detail(request):
             photoroom_url = "https://sdk.photoroom.com/v1/segment"
             headers = {
                 'Accept': 'image/png, application/json',
-                'x-api-key': 'f7771a44dacbb0f51885ae7c40fa6c17b02d6e0c'
+                'x-api-key': 'sandbox_f7771a44dacbb0f51885ae7c40fa6c17b02d6e0c'
             }
             payload = {
             }
