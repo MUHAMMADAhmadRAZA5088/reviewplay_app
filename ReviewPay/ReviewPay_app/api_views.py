@@ -310,7 +310,7 @@ def user_detail(request):
     if 'user' == request.user.role:
 
         try:
-            
+            color = request.POST.get('bg_color')
             image = request.FILES.get('image')
             file_extension = os.path.splitext(image.name)[1]  # Get file extension (e.g., .jpg, .png)
             new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
@@ -328,23 +328,23 @@ def user_detail(request):
                 ('image_file', (image.name, image.read(), 'application/octet-stream'))
             ]
             response_1 = requests.post(photoroom_url, headers=headers, data=payload, files=files)
-            try:
-                color = request.POST.get('bg_color')
-            except:
-                color = ''
-            if color != '':
-                payload['bg_color'] = color
-            response = requests.post(photoroom_url, headers=headers, data=payload, files=files)
+            # try:
+            #     color = request.POST.get('bg_color')
+            # except:
+            #     color = ''
+            # if color != '':
+            #     payload['bg_color'] = color
+            # response = requests.post(photoroom_url, headers=headers, data=payload, files=files)
     
             if 'image/png' not in response_1.headers.get('Content-Type', ''):
-                return JsonResponse({'error': 'PhotoRoom API failed.', 'details': response.text}, status=500)
+                return JsonResponse({'error': 'PhotoRoom API failed.', 'details': response_1.text}, status=500)
             
-            if 'image/png' not in response.headers.get('Content-Type', ''):
-                return JsonResponse({'error': 'PhotoRoom API failed.', 'details': response.text}, status=500)  
+            # if 'image/png' not in response.headers.get('Content-Type', ''):
+            #     return JsonResponse({'error': 'PhotoRoom API failed.', 'details': response.text}, status=500)  
                    
             # Step 2: Save the returned image (as profile_image)
             output_image = ContentFile(response_1.content, name=new_file_name)
-            output_image_1 = ContentFile(response.content, name=new_file_name)
+            # output_image_1 = ContentFile(response.content, name=new_file_name)
 
             # Step 3: Update or create user detail
             user_detail, created = UserDetail.objects.update_or_create(
@@ -358,7 +358,7 @@ def user_detail(request):
                     'post_code': request.POST.get('post_code'),
                     'date_of_birth': datetime.strptime(request.POST.get('date_of_birth'), '%d-%m-%Y').date(),
                     'profile_image': output_image,
-                    'profile_image_color': output_image_1
+                    'profile_image_color': color
                 }
             )
 
@@ -1265,3 +1265,27 @@ def referral_referrel_request(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def sharereferral_code(request):
+    user = request.user
+    data = request.POST
+    email =  data.get('email') 
+    try:
+        if user.role == 'user':
+            code = user.referral_code
+            share_user = CategoryUsers.objects.get(email = email)
+
+            massage = f"Hi {share_user.name}, {user.name} has sent you a referral code for the business. \n\n referral code : {code}"
+            if share_user:
+                notification =  NotificationMassage.objects.create(
+                user = share_user,
+                notification = massage
+                )
+                return JsonResponse({'message': 'Referral code shared successfully.'}, status=200)
+           
+    except:
+        return JsonResponse({'error': 'You are not a user'}, status=400)
+    

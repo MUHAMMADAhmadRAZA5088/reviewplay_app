@@ -7,6 +7,7 @@ from . import views, api_views, get_api_views, delete_view, google_view, email_v
 urlpatterns = [
 
     # referrel request
+    path('reviewpayrole_api/share_referrel/', api_views.sharereferral_code, name='sharereferral_code'),
     path('reviewpayrole_api/get_total_refferial/',get_api_views.get_total_refferial, name='total_referral'),
     path('reviewpayrole_api/referral/', api_views.referral_referrel_request, name='referral'),
     # tracker time
