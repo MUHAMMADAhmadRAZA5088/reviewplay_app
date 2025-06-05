@@ -310,7 +310,10 @@ def user_detail(request):
     if 'user' == request.user.role:
 
         try:
-            color = request.POST.get('bg_color')
+            try:
+                color = request.POST.get('bg_color')
+            except:
+                color = ''
             image = request.FILES.get('image')
             file_extension = os.path.splitext(image.name)[1]  # Get file extension (e.g., .jpg, .png)
             new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  # Username + UUID + extension
