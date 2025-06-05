@@ -28,7 +28,8 @@ urlpatterns = [
     # product_business_request_api
     path('reviewpayrole_api/product_invoice_history/', get_api_views.history_product_business_invoice,name='history_product_business_invoice'),
     path('reviewpayrole_api/product_client_review/', api_views.product_client_review, name='product_client_review'),
-    path('reviewpayrole_api/product_business_invoice/', api_views.product_business_invoice, name='product_business_invoice'),
+    path('reviewpayrole_api/review_business_invoice/', api_views.product_business_invoice, name='product_business_invoice'),
+    path('reviewpayrole_api/get_user_review/', get_api_views.get_review, name='get_review'),
 
     # email send api
     path('reviewpayrole_api/send_email/', email_view.send_email, name='send_email'),

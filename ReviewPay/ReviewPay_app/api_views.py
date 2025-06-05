@@ -1024,7 +1024,7 @@ def send_email(email ,name ,phone ,client_id ,product_id,business_id):
             data = json.load(file)   
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = data["key"]
-    website_url = f"https://reviewpay.com.au/UserDashboard/BusinessPostReview?product_id={product_id}&business_id={business_id}"
+    website_url = f"https://reviewpay.com.au/UserDashboard/BusinessPostReview?review_id={product_id}&business_id={business_id}"
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     subject = "Reviewpay product invoice"
     html_content = f"<html><body><h1>Thank you for your purchase!</h1><p>Dear Customer,</p>{website_url}<p></p> </body></html>"
@@ -1124,7 +1124,7 @@ def product_client_review(request):
         user = request.user
         data = request.POST
         user_simple = CategoryUsers.objects.get(id = user.id)
-        product = Product_business_invoice.objects.get(id= data["product_id"]) 
+        product = Product_business_invoice.objects.get(id= data["review_id"]) 
         business = BusinessVerifications.objects.get(id= data["business_id"])
         notification_business = CategoryUsers.objects.get(email=business.business) 
         project_review_client = ProductClientReview.objects.create(

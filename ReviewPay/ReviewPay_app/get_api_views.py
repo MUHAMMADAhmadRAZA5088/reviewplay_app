@@ -34,7 +34,7 @@ from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, favorate_business
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState, Follow
 from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
-from .models import Product_business_invoice, NotificationMassage, UserSession, refferial_code
+from .models import Product_business_invoice, NotificationMassage, UserSession, refferial_code, ProductClientReview
 User = get_user_model()  # Get the custom user model
 
 @api_view(['GET'])
@@ -908,3 +908,66 @@ def get_total_refferial(request):
         })
     return JsonResponse(data, safe=False, status=200)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_review(request):
+    try:
+        user = request.user
+        reviews = ProductClientReview.objects.filter(user=user)
+        data = []
+        for review in reviews:
+            data.append( 
+                {
+                'review id': review.product_id.id,
+                'user_email' : review.user.email,
+                'review_business' : review.business.business_web,
+                'benefit_quality' : review.benefit_quality,
+                'benefit_performance' : review.benefit_performance,
+                'benefit_rate' : review.benefit_rate,
+                'benefit_training' : review.benefit_training,
+                'culture_expertise' : review.culture_expertise,
+                'culture_extra_care' : review.culture_extra_care,
+                'culture_responsiveness' : review.culture_responsiveness,
+                'culture_professionalism' : review.culture_professionalism,
+                'operator_business_support' : review.operator_business_support,
+                'operator_delivery' : review.operator_delivery,
+                'operator_offering' : review.operator_offering,
+                'hear_about_us' : review.hear_about_us,
+                'experience' : review.experience,
+            }
+            )
+        return JsonResponse(data, safe=False, status=200)
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_detail(request):
+    user = request.user
+    try:
+        user_detail = UserDetail.objects.get(business=user)
+    except:
+        return JsonResponse({'error':'data is not find'}, status=404)
+    try:
+        data = {
+                'id': user_detail.id,
+                'first_name': user_detail.first_name,
+                'email' : user_detail.email,
+                'last_name': user_detail.last_name,  # Assuming you want to send the ID of the related business
+                'gender': user_detail.gender,
+                'date_of_birth': user_detail.date_of_birth,
+                'profile_image': 'https://superadmin.reviewpay.com.au' + user_detail.profile_image.url if user_detail.profile_image else None,  # Check if profile_image exists
+                'profile_image_color' : user_detail.profile_image_color,
+                'phone_number': user_detail.phone_number,
+                'post_code' : user_detail.post_code,
+            }
+        
+        # Return the data as JSON
+        return JsonResponse(data, status=200)
+        
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
