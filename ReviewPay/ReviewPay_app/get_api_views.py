@@ -971,3 +971,54 @@ def get_user_detail(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def get_review_average(request):
+    try:
+        business_verify_id = request.POST.get('business_verify_id')
+        business_verification =  ProductClientReview.objects.filter(business = business_verify_id)
+        total_user = business_verification.count()
+        quality = 0
+        performance = 0
+        rate = 0
+        training = 0
+        expertise = 0
+        extra_care = 0
+        responsiveness = 0
+        professionalism = 0
+        business_support = 0
+        delivery = 0
+        offering = 0
+
+        for review in business_verification:
+            quality = quality + review.benefit_quality
+            performance = performance + review.benefit_performance
+            rate = rate + review.benefit_rate
+            training = training + review.benefit_training
+            expertise = expertise + review.culture_expertise
+            extra_care = extra_care + review.culture_extra_care
+            responsiveness = responsiveness + review.culture_responsiveness
+            professionalism = professionalism + review.culture_professionalism
+            business_support = business_support + review.operator_business_support
+            delivery = delivery + review.operator_delivery
+            offering = offering + review.operator_offering
+        
+        return JsonResponse({
+            'benefit_quality' : quality/total_user,
+            'review_performance' : performance/total_user,
+            'review_rate' : rate/total_user,
+            'review_training' : training/total_user,
+            'culture_expertise' : expertise/total_user,
+            'culture_extra_care' : extra_care/total_user,
+            'culture_responsiveness' : responsiveness/total_user,
+            'culture_professionalism' : professionalism/total_user,
+            'operator_business_support' : business_support/total_user,
+            'operator_delivery' : delivery/total_user,
+            'operator_offering' : offering/total_user
+            
+        }, safe=False, status=200)
+        
+    except:
+        pass
