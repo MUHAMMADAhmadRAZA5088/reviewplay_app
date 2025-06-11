@@ -916,11 +916,17 @@ def get_review(request):
         reviews = ProductClientReview.objects.filter(user=user)
         data = []
         for review in reviews:
+            category_business =  Businessdetail.objects.get(business = review.business.business)
+            images = category_business.business_image.all() 
+            logos = category_business.business_logo.all()
             data.append( 
                 {
                 'review id': review.product_id.id,
                 'user_email' : review.user.email,
                 'review_business' : review.business.business_web,
+                'business name' : category_business.business_name,
+                'images' : ['https://superadmin.reviewpay.com.au' + image.image.url for image in images],
+                'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
                 'benefit_quality' : review.benefit_quality,
                 'benefit_performance' : review.benefit_performance,
                 'benefit_rate' : review.benefit_rate,
@@ -934,6 +940,7 @@ def get_review(request):
                 'operator_offering' : review.operator_offering,
                 'hear_about_us' : review.hear_about_us,
                 'experience' : review.experience,
+                'timestap' : category_business.created_at,
             }
             )
         return JsonResponse(data, safe=False, status=200)

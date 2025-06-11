@@ -49,7 +49,8 @@ class Businessdetail(models.Model):
     abn_number = models.CharField(max_length=20, null=True, blank=True)
     business_name = models.CharField(max_length=100, null=True, blank=True)
     business_address = models.TextField(null=True, blank=True)
-
+    created_at = models.DateTimeField(auto_now_add=True)  # set on create
+    updated_at = models.DateTimeField(auto_now=True)      # update on every save
     def save(self, *args, **kwargs):
         if not self.marchant_api_key:  # Agar API key nahi hai to generate karo
             self.marchant_api_key = secrets.token_urlsafe(32)  # 32-character long secure key

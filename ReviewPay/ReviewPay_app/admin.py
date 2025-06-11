@@ -39,7 +39,7 @@ class CategoryUsersAdmin(UserAdmin):
  
 # Register the Businessdetail model with its own admin class
 class BusinessdetailAdmin(admin.ModelAdmin):
-    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number' ,'delete_option')
+    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number', 'created_at' ,'delete_option')
 
    
         # Custom column for delete
