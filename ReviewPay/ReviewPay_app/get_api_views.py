@@ -1000,7 +1000,8 @@ def get_review_average(request):
         business_support = 0
         delivery = 0
         offering = 0
-
+        hear = []
+        data = []
         for review in business_verification:
             quality = quality + review.benefit_quality
             performance = performance + review.benefit_performance
@@ -1013,6 +1014,12 @@ def get_review_average(request):
             business_support = business_support + review.operator_business_support
             delivery = delivery + review.operator_delivery
             offering = offering + review.operator_offering
+            data.append({
+                "name" : review.product_id.client_name,
+                "review" : review.experience,
+                'refferial' : review.hear_about_us
+            })
+          
         
         return JsonResponse({
             'benefit_quality' : quality/total_user,
@@ -1025,9 +1032,11 @@ def get_review_average(request):
             'culture_professionalism' : professionalism/total_user,
             'operator_business_support' : business_support/total_user,
             'operator_delivery' : delivery/total_user,
-            'operator_offering' : offering/total_user
-            
+            'operator_offering' : offering/total_user,
+            'review' : data
         }, safe=False, status=200)
         
-    except:
-        pass
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
