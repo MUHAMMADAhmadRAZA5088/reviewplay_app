@@ -1017,7 +1017,18 @@ def get_review_average(request):
             data.append({
                 "name" : review.product_id.client_name,
                 "review" : review.experience,
-                'refferial' : review.hear_about_us
+                'refferial' : review.hear_about_us,
+                'benefit_quality' : quality,
+                'review_performance' : performance,
+                'review_rate' : rate,
+                'review_training' : training/total_user,
+                'culture_expertise' : expertise,
+                'culture_extra_care' : extra_care,
+                'culture_responsiveness' : responsiveness,
+                'culture_professionalism' : professionalism,
+                'operator_business_support' : business_support,
+                'operator_delivery' : delivery,
+                'operator_offering' : offering,
             })
           
         
