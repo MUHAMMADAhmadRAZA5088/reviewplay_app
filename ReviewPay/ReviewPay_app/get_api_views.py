@@ -438,14 +438,8 @@ def qr_scan_api(request):
             status=status
         )
         return redirect(f"{url}?uccid={scan_entry.id}&user_id{user_id}&business_id={business_id}")
-        # return JsonResponse({
-        #     "message": "Scan recorded",
-        #     "status": "pending",
-        #     "scan_id": scan_entry.id,  
-        #     "business_id" : business_id,
-        #     "user_id" : user_id,
-        #     "website_url" : f"{url}?uccid={scan_entry.id}&user_id{user_id}&business_id={business_id}"
-        # }, status=200)
+
+
     
     return JsonResponse({"error": "Invalid request"}, status=400)
 
@@ -980,12 +974,20 @@ def get_user_detail(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_review_average(request):
     try:
-        business_verify_id = request.POST.get('business_verify_id')
-        business_verification =  ProductClientReview.objects.filter(business = business_verify_id)
+        
+        user = request.user
+        try:
+            business_verification = BusinessVerifications.objects.get(business= user)
+        except:
+            return JsonResponse({'error':'business is not verified'}, status=404)
+        try:
+            business_verification =  ProductClientReview.objects.filter(business = business_verification.id)
+        except:
+            return JsonResponse({'error':'ClientView has not found '}, status=404)
         total_user = business_verification.count()
         quality = 0
         performance = 0
