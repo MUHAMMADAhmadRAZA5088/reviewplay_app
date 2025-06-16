@@ -271,8 +271,6 @@ class Notifications(models.Model):
     user_id = models.ForeignKey(CategoryUsers, on_delete=models.CASCADE, related_name="notifications")
     business_detail = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     business_detail_date = models.DateField(null=True, blank=True)
-    product_image = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    product_image_date = models.DateField(null=True, blank=True)
     business_verify = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     business_verify_date = models.DateField(null=True, blank=True)
 

@@ -374,7 +374,7 @@ class QRScanAdmin(admin.ModelAdmin):
             }
 
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('id','user_id','business_detail','business_detail_date','product_image','product_image_date','business_verify','business_verify_date','delete_option')
+    list_display = ('id','user_id','business_detail','business_detail_date','business_verify','business_verify_date','delete_option')
     # Custom column for delete
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])

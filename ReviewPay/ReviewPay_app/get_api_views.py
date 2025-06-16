@@ -77,7 +77,7 @@ def get_business_detail(request):
         business_detail = Businessdetail.objects.get(business=user)
         videos = business_detail.business_video.all()
         logos = business_detail.business_logo.all() 
-        images = business_detail.business_image.all()
+        # images = business_detail.business_image.all()
 
     except:
         return JsonResponse({'error':'data is not find'}, status=404)
@@ -94,7 +94,7 @@ def get_business_detail(request):
                 'sub_category': business_detail.sub_category,
                 'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
                 'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
-                'images': ['https://superadmin.reviewpay.com.au' + image.image.url for image in images],
+
                 "review_cashbacks": list(business_detail.ReviewCashback.all().values(
                                         "id", "review_amount_cashback_percent", "review_amount_cashback_fixed",
                                         "review_cashback_return_refund_period", "review_cashback_expiry"
@@ -495,13 +495,6 @@ def notification(request):
                 notification.business_detail_date = date.today()
                 notification.save()
         
-        if notification.product_image_date:
-            total_day = (current_date - notification.product_image_date).days
-            if total_day >= 3 and notification.product_image == 'delay' :
-                notification.product_image = 'pending'
-                notification.product_image_date = date.today()
-                notification.save()
-
         if notification.business_verify_date:
             total_day = (current_date - notification.business_verify_date).days
             if total_day >= 3 and notification.business_verify == 'delay' :
@@ -512,8 +505,6 @@ def notification(request):
         return JsonResponse({'id': notification.id,
                              'business_detail':notification.business_detail,
                              'business_detail_date':notification.business_detail_date,
-                             'product_image':notification.product_image,
-                             'product_image_date':notification.product_image_date,
                              'business_verify':notification.business_verify,
                              'business_verify_date':notification.business_verify_date
                              }, safe=False, status=200)

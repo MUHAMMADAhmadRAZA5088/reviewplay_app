@@ -204,9 +204,15 @@ def create_or_update_business_detail(request):
                 'business_address': business_data.get("businessAddress"),
             }
         )
-
         # Get multiple images
-        business_logos = request.FILES.getlist("businessLogo")
+        try:
+            business_logos = request.FILES.getlist("businessLogo")
+        except:
+            return JsonResponse({'error': 'Business logo is not define.'}, status=400)
+        try:
+            videos = request.FILES.getlist("video")
+        except:
+            return JsonResponse({'error': 'Video is not define.'}, status=400)
         
         for business_logo in business_logos:
             file_extension = os.path.splitext(business_logo.name)[1]  
@@ -215,7 +221,13 @@ def create_or_update_business_detail(request):
 
             # Correctly link to `Businessdetail` instance
             BusinessLogo.objects.create(business=business_detail, image=business_logo)
-        
+        for video in videos:
+            file_extension = os.path.splitext(video.name)[1]
+            new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"
+            video.name = new_file_name
+            # Correctly link to `Businessdetail` instance
+            BusinessVideo.objects.create(business=business_detail, video=video)
+
         ReviewCashback.objects.update_or_create(business=business_detail)
         ReferralCashback.objects.update_or_create(business=business_detail)
         
@@ -511,13 +523,10 @@ def upload_business_video_and_image(request):
 
         # Get multiple videos from request
         videos = request.FILES.getlist('video')
-        images = request.FILES.getlist('image')
+    
 
         if not videos:
             return JsonResponse({'error': 'No videos uploaded.'}, status=400)
-
-        if not images:
-            return JsonResponse({'error': 'No images uploaded.'}, status=400)
 
         for video in videos:
             # Generate unique filename
@@ -527,22 +536,8 @@ def upload_business_video_and_image(request):
 
             # Save to database
             business_video = BusinessVideo.objects.create(business=business_detail, video=video)
-          
-        for image in images:
-            # Generate unique filename
-            file_extension = os.path.splitext(video.name)[1]  
-            new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  
-            video.name = new_file_name  
-
             # Save to database
-            business_images = BusinessImage.objects.create(business=business_detail, image=image)
-        try:
-            notification = Notifications.objects.get(user_id=user)
-            notification.product_image = 'success'
-            notification.product_image_date = date.today()
-            notification.save()
-        except:
-            return Response({'message': 'Notification Error'}, status=400)
+        
         return Response({'message': 'Videos and images uploaded successfully.'}, status=201)
 
     except Exception as e:
