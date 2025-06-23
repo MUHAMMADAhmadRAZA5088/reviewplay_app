@@ -521,22 +521,43 @@ def upload_business_video_and_image(request):
         if not business_detail:
             return JsonResponse({'error': 'Business detail not found for this user.'}, status=404)
 
-        # Get multiple videos from request
-        videos = request.FILES.getlist('video')
-    
+        
+        
+        videos_and_image = request.FILES.getlist('video_and_image')
+        business_logo = request.FILES.get('business_logo')
 
-        if not videos:
-            return JsonResponse({'error': 'No videos uploaded.'}, status=400)
-
-        for video in videos:
-            # Generate unique filename
-            file_extension = os.path.splitext(video.name)[1]  
+        if business_logo:
+            file_extension = os.path.splitext(business_logo.name)[1]  
             new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  
-            video.name = new_file_name  
+            business_logo.name = new_file_name
+            obj, created = BusinessLogo.objects.update_or_create(
+                business = business_detail,
+                defaults={'business_logo': business_logo}
+                )
+            print("updated logo")
 
-            # Save to database
-            business_video = BusinessVideo.objects.create(business=business_detail, video=video)
-            # Save to database
+
+        if not videos_and_image:
+            return JsonResponse({'error': 'No videos or images uploaded.'}, status=400)
+
+        for video in videos_and_image:
+            # Generate unique filename
+            
+            if video.content_type == 'video/mp4':
+                file_extension = os.path.splitext(video.name)[1]  
+                new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  
+                video.name = new_file_name
+                # Save to database
+                business_video = BusinessVideo.objects.create(business=business_detail, video=video)
+                # Save to database
+            if video.content_type in ['image/png', 'image/jpeg', 'image/svg+xml']:
+                file_extension = os.path.splitext(video.name)[1]  
+                new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  
+                video.name = new_file_name  
+                # Save to database
+                business_image = BusinessImage.objects.create(business=business_detail, image=video)
+                
+
         
         return Response({'message': 'Videos and images uploaded successfully.'}, status=201)
 
