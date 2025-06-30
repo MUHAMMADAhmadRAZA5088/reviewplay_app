@@ -65,9 +65,12 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'ReviewPay.urls'
 
 CORS_ALLOWED_ORIGINS = [
+    "*",
     "http://192.168.100.14",
     "https://reviewpay.com.au",
-    "https://superadmin.reviewpay.com.au"
+    "https://superadmin.reviewpay.com.au",
+    "192.168.0.107",
+    "http://192.168.0.107"
 ]
 
 
