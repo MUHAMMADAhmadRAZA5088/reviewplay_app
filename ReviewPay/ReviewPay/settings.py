@@ -64,20 +64,20 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'ReviewPay.urls'
 
-CORS_ALLOWED_ORIGINS = [
-    '*',
-    'http:142.93.246.188',
-    'http:13.236.178.111',
-    'http://localhost:8000',
-    "http://192.168.100.14",
-    "https://reviewpay.com.au",
-    "https://superadmin.reviewpay.com.au",
-    "192.168.0.107",
-    "142.93.246.188",
-    "13.236.178.111",
-    "http://192.168.0.107"
-]
-
+# CORS_ALLOWED_ORIGINS = [
+#     '*',
+#     'http:142.93.246.188',
+#     'http:13.236.178.111',
+#     'http://localhost:8000',
+#     "http://192.168.100.14",
+#     "https://reviewpay.com.au",
+#     "https://superadmin.reviewpay.com.au",
+#     "192.168.0.107",
+#     "142.93.246.188",
+#     "13.236.178.111",
+#     "http://192.168.0.107"
+# ]
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
