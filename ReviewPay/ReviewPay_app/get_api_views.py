@@ -93,7 +93,7 @@ def get_business_detail(request):
                 'category': business_detail.category,
                 'sub_category': business_detail.sub_category,
                 'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
-                'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
+                'video_or_image' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
 
                 "review_cashbacks": list(business_detail.ReviewCashback.all().values(
                                         "id", "review_amount_cashback_percent", "review_amount_cashback_fixed",
@@ -556,7 +556,7 @@ def get_business_detail_one(request, Business_id):
                 'category': business_detail.category,
                 'sub_category': business_detail.sub_category,
                 'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
-                'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
+                'video_or_image' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
                 "review_cashbacks": list(business_detail.ReviewCashback.all().values(
                                         "id", "review_amount_cashback_percent", "review_amount_cashback_fixed",
                                         "review_cashback_return_refund_period", "review_cashback_expiry"
