@@ -206,27 +206,19 @@ def create_or_update_business_detail(request):
         )
         # Get multiple images
         try:
-            business_logos = request.FILES.getlist("businessLogo")
+            business_logo = request.FILES.get("businessLogo")
         except:
             return JsonResponse({'error': 'Business logo is not define.'}, status=400)
         try:
-            videos = request.FILES.getlist("video")
+            video_images = request.FILES.get("video_images")
         except:
             return JsonResponse({'error': 'Video is not define.'}, status=400)
         
-        for business_logo in business_logos:
-            file_extension = os.path.splitext(business_logo.name)[1]  
-            new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"  
-            business_logo.name = new_file_name  
+        
+        business_logo, created = BusinessLogo.objects.update_or_create(business=business_detail, defaults= {'image' : business_logo})
 
-            # Correctly link to `Businessdetail` instance
-            BusinessLogo.objects.create(business=business_detail, image=business_logo)
-        for video in videos:
-            file_extension = os.path.splitext(video.name)[1]
-            new_file_name = f"{user.id}_{uuid4().hex}{file_extension}"
-            video.name = new_file_name
-            # Correctly link to `Businessdetail` instance
-            BusinessVideo.objects.create(business=business_detail, video=video)
+        # Correctly link to `Businessdetail` instance
+        business_video, created = BusinessVideo.objects.update_or_create(business = business_detail,defaults = {'video' :video_images})
 
         ReviewCashback.objects.update_or_create(business=business_detail)
         ReferralCashback.objects.update_or_create(business=business_detail)

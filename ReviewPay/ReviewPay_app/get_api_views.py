@@ -522,7 +522,6 @@ def get_business_detail_one(request, Business_id):
         business_detail = Businessdetail.objects.get(id = Business_id)
         videos = business_detail.business_video.all()
         logos = business_detail.business_logo.all() 
-        images = business_detail.business_image.all()
         try:
             business_verification = BusinessVerifications.objects.get(business= business_detail.business) 
         except:
@@ -558,7 +557,6 @@ def get_business_detail_one(request, Business_id):
                 'sub_category': business_detail.sub_category,
                 'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
                 'video' : ['https://superadmin.reviewpay.com.au' + video.video.url for video in videos],
-                'images': ['https://superadmin.reviewpay.com.au' + image.image.url for image in images],
                 "review_cashbacks": list(business_detail.ReviewCashback.all().values(
                                         "id", "review_amount_cashback_percent", "review_amount_cashback_fixed",
                                         "review_cashback_return_refund_period", "review_cashback_expiry"
