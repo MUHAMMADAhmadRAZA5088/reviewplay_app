@@ -224,13 +224,15 @@ def create_or_update_business_detail(request):
         ReferralCashback.objects.update_or_create(business=business_detail)
         
         message = 'Business data added successfully.' if created else 'Business data updated successfully.'
+        
         try:
             notification = Notifications.objects.get(user_id=user)
             notification.business_detail = 'success'
             notification.business_detail_date = date.today()
             notification.save()
         except:
-            return JsonResponse({'message': 'notification error'}, status=400)
+            pass
+            # return JsonResponse({'message': 'notification error'}, status=400)
 
         return JsonResponse({'message': message}, status=200)
 

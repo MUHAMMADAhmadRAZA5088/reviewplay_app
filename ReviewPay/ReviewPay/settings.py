@@ -103,6 +103,11 @@ PAYPAL_SECRET = "EIFQCFSF-A5kjlh-iPKo_5gCDuUzNxVOT1JJzwXjo85C2YE0oVv2hUZm0cHvszO
 PAYPAL_API_URL = "https://api-m.sandbox.paypal.com"  # LIVE ke liye 'sandbox' hatao
 
 
+
+# None ka matlab unlimited
+DATA_UPLOAD_MAX_MEMORY_SIZE = None  
+FILE_UPLOAD_MAX_MEMORY_SIZE = None
+
 # Database
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
