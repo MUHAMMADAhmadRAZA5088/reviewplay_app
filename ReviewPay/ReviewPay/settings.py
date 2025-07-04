@@ -105,8 +105,8 @@ PAYPAL_API_URL = "https://api-m.sandbox.paypal.com"  # LIVE ke liye 'sandbox' ha
 
 
 # None ka matlab unlimited
-DATA_UPLOAD_MAX_MEMORY_SIZE = None  
-FILE_UPLOAD_MAX_MEMORY_SIZE = None
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100 MB
 
 # Database
 # Database
