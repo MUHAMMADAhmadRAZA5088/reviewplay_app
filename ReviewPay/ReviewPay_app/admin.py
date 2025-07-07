@@ -135,7 +135,7 @@ class BarcodeAdmin(admin.ModelAdmin):
         }
 @admin.register(BusinessVerifications)
 class BusinessVerificationsAdmin(admin.ModelAdmin):
-    list_display = ('id','business', 'ACN', 'business_web','fullname_director_1' , 'fullname_director_2', 'admin_phone_number', 'business_phone_number','facebook_link' , 'instra_link', 'admin_email','client_email' , 'openning_hours', 'government_issue_document', 'business_name_evidence','company_extract_issue' ,'delete_option')
+    list_display = ('id','business', 'ACN', 'business_web','fullname_director_1' , 'fullname_director_2', 'admin_phone_number', 'business_phone_number','facebook_link' , 'instra_link', 'admin_email','client_email' , 'monday_from','monday_to','tuesday_from','tuesday_to','wednesday_from','wednesday_to', 'thursday_from','thursday_to','friday_from','friday_to','saturday_from','saturday_to','sunday_from','sunday_to' , 'government_issue_document', 'business_name_evidence','company_extract_issue' ,'delete_option')
 
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])
