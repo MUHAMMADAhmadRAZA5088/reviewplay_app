@@ -6,6 +6,8 @@ from . import views, api_views, get_api_views, delete_view, google_view, email_v
 
 urlpatterns = [
 
+    # indestry question
+    path('reviewpayrole_api/industry', get_api_views.get_industry_question, name='get_industry_question'),
     # referrel request
     path('reviewpayrole_api/share_referrel/', api_views.sharereferral_code, name='sharereferral_code'),
     path('reviewpayrole_api/get_total_refferial/',get_api_views.get_total_refferial, name='total_referral'),

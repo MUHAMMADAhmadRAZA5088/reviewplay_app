@@ -368,3 +368,11 @@ class UserSession(models.Model):
 class refferial_code(models.Model):
     user_email = models.CharField(max_length=255)
     refferial_code = models.CharField(max_length=255)
+
+class industry_question(models.Model):
+    indestry = models.TextField()
+    business_type = models.TextField()
+    metrix = models.TextField()
+    metrix_question = models.TextField()
+    metrix_category = models.TextField()
+    sector = models.TextField()

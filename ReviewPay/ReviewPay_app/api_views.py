@@ -1,4 +1,4 @@
-import json, requests
+import json, requests, re
 import threading
 import time
 import base64
@@ -36,7 +36,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.models import User 
 from .models import CategoryUsers, Businessdetail, Employee, Product, Product_business_invoice
-from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business, Follow
+from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business, Follow, industry_question
 from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user, ProductClientReview
 from .models import BusinessLogo, BusinessVideo, BusinessImage, OrderTracking,NotificationMassage
 from .models import ReviewCashback,ReferralCashback, UserCashBack,Notifications, UserSession, refferial_code
@@ -68,7 +68,11 @@ def api_signup(request):
         confirm_password = request.POST.get('confirmPassword')
         role = request.POST.get('role')
         referral_code = request.POST.get('referral_code')
-      
+
+        if not re.search(r'[A-Z]', password):
+            return JsonResponse({ "error": "Password must contain at least one uppercase letter." }, status=400)
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            return JsonResponse({ "error":"Password must contain at least one special character."}, status=400)
         # Validation for required fields
         if not name or not email or not password:
             return JsonResponse({'error': 'Username, email, and password are required'}, status=400)
@@ -1314,4 +1318,5 @@ def sharereferral_code(request):
            
     except:
         return JsonResponse({'error': 'You are not a user'}, status=400)
-    
+
+

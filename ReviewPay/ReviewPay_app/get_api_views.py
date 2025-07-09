@@ -33,7 +33,7 @@ from django.utils import timezone
 from datetime import datetime
 from .models import CategoryUsers, Businessdetail,BusinessVerifications, Employee, favorate_business
 from .models import Product, UserDetail, Feedback, ProductImage, Barcode, BusinessState, Follow
-from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications
+from .models import BusinessImage,BusinessLogo,BusinessVideo,UserCashBack, QRScan,Notifications, industry_question
 from .models import Product_business_invoice, NotificationMassage, UserSession, refferial_code, ProductClientReview
 User = get_user_model()  # Get the custom user model
 
@@ -1092,3 +1092,51 @@ def get_review_average(request):
         return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_industry_question(request):
+    industry = request.GET.get('industry')
+    category = request.GET.get('industry')
+    decoded_business_types = []
+    if category :
+        try:
+            # Encode the received industry string to Base64
+            category = base64.b64encode(category.strip().encode('utf-8')).decode('utf-8')
+
+            # Query the DB for matching encoded industry
+            business_types = (
+                industry_question.objects
+                .filter(indestry=category)
+                .values_list('business_type', flat=True)
+                .distinct()
+            )
+            
+            for b in business_types:
+                try:
+                    decoded = base64.b64decode(b).decode('utf-8')
+                    decoded_business_types.append(decoded)
+                except Exception as e:
+                    print(f"Decode error on business_type: {e}")
+            
+        except Exception as e:
+            print(f"Encoding or query error: {e}")
+        
+        return JsonResponse({'industry': industry, 'business type' : decoded_business_types }, safe=False, status=200)
+
+    if category == None:
+
+        industry = industry_question.objects.values_list('indestry', flat=True).distinct()
+            # Decode karein
+        decoded_industries = []
+        for encoded in industry:
+            try:
+                decoded = base64.b64decode(encoded).decode('utf-8')
+                decoded_industries.append(decoded)
+            except Exception as e:
+                print(f"Decode error for {encoded}: {e}")
+    
+        return JsonResponse(decoded_industries, safe=False, status=200)
+    
+    
