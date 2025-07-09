@@ -1099,7 +1099,45 @@ def get_review_average(request):
 def get_industry_question(request):
     industry = request.GET.get('industry')
     category = request.GET.get('industry')
+    business_type = request.GET.get('business_type')
+    # import pdb;pdb.set_trace()
     decoded_business_types = []
+
+    if category and business_type:
+        benefit = []
+        culcure = []
+        operations = []
+        try:
+            # Encode both values to match DB
+            encoded_industry = base64.b64encode(category.strip().encode('utf-8')).decode('utf-8')
+            encoded_business_type = base64.b64encode(business_type.strip().encode('utf-8')).decode('utf-8')
+
+            # Filter by both
+            filtered_data = industry_question.objects.filter(
+                indestry=encoded_industry,
+                business_type=encoded_business_type
+            )
+            
+            for data in filtered_data:
+                metrix_category = base64.b64decode(data.metrix_category).decode('utf-8')
+           
+                if metrix_category == 'Benefit':
+                    benefit.append(base64.b64decode(data.metrix_question).decode('utf-8'))
+                elif metrix_category == 'Culture':
+                    culcure.append(base64.b64decode(data.metrix_question).decode('utf-8'))
+                elif metrix_category == 'Operations':
+                    operations.append(base64.b64decode(data.metrix_question).decode('utf-8'))
+            
+            return JsonResponse({
+                                    'industry': industry,
+                                    'business type' : business_type,
+                                    'Benefit' : benefit,
+                                    'Culture' : culcure,
+                                    'Operations' : operations 
+                                }, safe=False, status=200)
+
+        except Exception as e:
+            print(f"Encoding or query error: {e}")
     if category :
         try:
             # Encode the received industry string to Base64
