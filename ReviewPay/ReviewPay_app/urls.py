@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import views, api_views, get_api_views, delete_view, google_view, email_view
 
 urlpatterns = [
-
+    path('reviewpayrole_api/scan_image', api_views.visionapi, name='scan_image'),
     # indestry question
     path('reviewpayrole_api/industry', get_api_views.get_industry_question, name='get_industry_question'),
     # referrel request

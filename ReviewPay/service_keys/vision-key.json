@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "visionary-reviewpay",
+  "private_key_id": "8b9fa09febd3c0d84cc8ea83937e135ee735e5e7",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDqLoNV205NCDeK\nR4aHMYS8/qWiRoobJl1Dcw9zQ6F3+hfHKp+cp2vswEr2yQTzFyRiHtntlGpqmvxV\nmbKWe2dNPKC0D/oYRA2VuUXjqfca/Gv2Jvc6w9ego68assWLVCY9bK5afTU0zuPQ\n2Uy64hahaW1Zygo06N3smBQx1twMnio6j0rPtP9ebaotA0GNG+w2xjrtQdyIySFc\nenfK6wj7YTdHOvSxSrutHoRvMLQgRlv4FXQhOJEq01hux0JkC95rA1yjjlngeRxa\nxINHPKGYmY/uCcYrcFdzH6nIsXTvaMqkNUWn/Cotn/ADW+Ft2CUUWyxz51VzbwC6\nQnS2pAXNAgMBAAECggEAHwQaEP0C2eEEuiPPBYjhc8amWV/OWtox8AUFPtbuQ92z\n2IUkrrLd8HVneFgXd7rQ7s33PygxD/2G/i9lH9koTWqCPlb/YMdipTnsr8KLH9/e\nzLNMe1QE8xm6z2ZuE44JookKbqG2sk/UjIy7ROU86hP0j7fasjdFbViXFCLI8kKf\noPjqLF/AB5xwLeB4KZdrAsCQCtqC1AhXrntIZVj+hmmHWTIVHn5nIvlkFGJZHbiy\nL4MqNdSmpHjXfQJtXlGK5KPR4IxRpMXBf+cVDFDYaZH789Zwa8BBiDYkKTvR//mo\np6CP1HBuScnviQtBOIoHzV33IDKEbIUSzUYixySsAQKBgQD8y6S1KykkAlgKqlVZ\nWw1Z1QKCqSQmfrasr/H7beAfAc7JwPEL7mZm5no+zx4mYJ0b7X+ZbQLAleaT4i2c\nOew4uKfuBsLlyWDi0q+gW2ifAZwx1cQQVhCMhFWvmlSPkLkCR2H36LhJS4sb0Z4l\nFeXGL/ewz/XRSNmlVxake4vvrQKBgQDtJncdZBOhknS3CWJ2aM73icUNk8pBSifR\nMu8npAVffivboWFRRI7AzEnu3P4ZqW3LeoBVIUAQfVh6Sj5EsogikKevmrl1AHYu\ngt+nIIGGpciWySkJDrBUeYi6Qi7KmJ8DEyy+JS+Bu2E8ZNverfh+wy+ttwGpAIqG\nBi5oQmyyoQKBgQCTpUkEuzmjG29ag1OoBcMNdZiqwakohpeg0n5tkCX3VjH1qiff\nBRVwAirh5kxAs+ru9c6xyHZ0DtkGBHMJLNdn5YnHPtG0LeLVd6I18U1wmRsmDCkg\nNXQi7eOx1VyQIUG9L/3rMlP4ExQjYlGQbXKvRzLOZRe4bWkY5X2HAdWgXQKBgQCB\nc2PF+WD163omh8rlk+SWHvAfrzLSXOZLPaBqZRBBxh+urfLvZ5r9Bwa8iolx/Jhg\nYCg5UAMmfSWU633+Be5l38yJAM6HXY8laG8pTYcmtsw98uShexEpq4XFFmdwU8tI\n5GiiCq5aBKzZSLz0Wsawe19FVgZj+FWlPy6J3uhywQKBgCsqdNXvWNQ1Sp+Kh2vn\nPl85iaw1nDSajxYBVzUpzAl9CYq3iWu+l2owtCYAWJdNnlbBV59BAk1JsXRMDcQ1\n6g7kQ+gJnCjI5VI8vhDVO/5lgTLCkMpbgfjUtGPZJbGwSNv8XgVA7VCn5IYn+7J6\nFBkNCy5PfPDaTXlugxHR6egC\n-----END PRIVATE KEY-----\n",
+  "client_email": "testvisionary@visionary-reviewpay.iam.gserviceaccount.com",
+  "client_id": "108129934417822397325",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/testvisionary%40visionary-reviewpay.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

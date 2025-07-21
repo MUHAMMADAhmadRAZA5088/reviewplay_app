@@ -35,6 +35,11 @@ from rest_framework import status
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.models import User 
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
+from google.cloud import vision
+import os
 from .models import CategoryUsers, Businessdetail, Employee, Product, Product_business_invoice
 from .models import UserDetail, Feedback, Barcode, ProductImage, favorate_business, Follow, industry_question
 from .models import BusinessVerifications,CommingsoonLogin, Welcome_new_user, ProductClientReview
@@ -1320,3 +1325,16 @@ def sharereferral_code(request):
         return JsonResponse({'error': 'You are not a user'}, status=400)
 
 
+@api_view(['POST'])
+@parser_classes([MultiPartParser])
+def visionapi(request):
+    image_file = request.FILES.get('image')
+    if not image_file:
+        return Response({'error': 'No image uploaded'}, status=400)
+    # import pdb;pdb.set_trace()
+    client = vision.ImageAnnotatorClient.from_service_account_file(os.path.join('service_keys', 'vision-key.json'))
+    image = vision.Image(content=image_file.read())
+    response = client.label_detection(image=image)
+    labels = [label.description for label in response.label_annotations]
+
+    return Response({'labels': labels})
