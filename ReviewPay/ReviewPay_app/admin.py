@@ -39,7 +39,7 @@ class CategoryUsersAdmin(UserAdmin):
  
 # Register the Businessdetail model with its own admin class
 class BusinessdetailAdmin(admin.ModelAdmin):
-    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'abn_number', 'created_at' ,'delete_option')
+    list_display = ('id','business','marchant_api_key' ,'business_name', 'category', 'sub_category', 'description','abn_number', 'created_at' ,'delete_option')
 
    
         # Custom column for delete
@@ -424,7 +424,7 @@ class favorate_businessAdmin(admin.ModelAdmin):
                 'all': ('css/custom.css',)  # Ensure correct static path
             }
 class Product_business_invoiceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_id', 'business_id', 'product_service', 'invoice_amount', 'reviewcashback', 'refferial_code','client_name','client_phone','client_email','proof_purchase','delete_option')
+    list_display = ('id', 'user_id', 'business_id', 'product_service', 'invoice_amount', 'invoice_number', 'reviewcashback', 'refferial_code','client_name','client_phone','client_email','proof_purchase','delete_option')
         # Custom column for delete
     def delete_option(self, obj):
         delete_url = reverse('admin:%s_%s_delete' % (obj._meta.app_label, obj._meta.model_name), args=[obj.id])

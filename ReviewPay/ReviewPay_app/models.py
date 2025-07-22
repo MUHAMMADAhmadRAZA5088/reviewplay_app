@@ -48,6 +48,7 @@ class Businessdetail(models.Model):
     sub_category = models.CharField(max_length=100, null=True, blank=True)
     abn_number = models.CharField(max_length=20, null=True, blank=True)
     business_name = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     business_address = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)  # set on create
     updated_at = models.DateTimeField(auto_now=True)      # update on every save
@@ -312,6 +313,7 @@ class Product_business_invoice(models.Model):
     business = models.ForeignKey(BusinessVerifications, on_delete=models.CASCADE, related_name='business_detail')
     product_service = models.CharField(max_length=100)
     invoice_amount = models.CharField(max_length=100)
+    invoice_number = models.CharField(max_length=100)
     reviewcashback = models.CharField(max_length=100)
     refferial_code = models.CharField(max_length=100)
     client_name = models.CharField(max_length=100)

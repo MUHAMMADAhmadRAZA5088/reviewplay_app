@@ -90,6 +90,7 @@ def get_business_detail(request):
                 'email' : business_detail.business.email,
                 'business_address' : business_detail.business_address,
                 'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
+                'description' : business_detail.description,
                 'category': business_detail.category,
                 'sub_category': business_detail.sub_category,
                 'Logos' : ['https://superadmin.reviewpay.com.au' + logo.image.url for logo in logos],
@@ -174,6 +175,7 @@ def get_business_detail_all(request):
                         'marchant api' : business_detail.marchant_api_key,
                         'email' : business_detail.business.email,
                         'business_address' : business_detail.business_address,
+                        'description' : business_detail.description,
                         'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
                         'category': business_detail.category,
                         'sub_category': business_detail.sub_category,
@@ -589,6 +591,7 @@ def get_business_detail_one(request, Business_id):
                 'id': business_detail.id,
                 'business_name': business_detail.business_name,
                 'marchant api' : business_detail.marchant_api_key,
+                'description' : business_detail.description,
                 'email' : business_detail.business.email,
                 'business_address' : business_detail.business_address,
                 'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
@@ -737,6 +740,7 @@ def get_favorite_businesses(request):
                         'business_name': business_detail.business_name,
                         'marchant api' : business_detail.marchant_api_key,
                         'email' : business_detail.business.email,
+                        'description' : business_detail.description,
                         'business_address' : business_detail.business_address,
                         'abn_number': business_detail.abn_number,  # Assuming you want to send the ID of the related business
                         'category': business_detail.category,
@@ -786,6 +790,7 @@ def history_product_business_invoice(request):
                         'business_id' : product.business.id,
                         'product_service' : product.product_service,
                         'invoice_amount' : product.invoice_amount,
+                        'invoice_number' : product.invoice_number,
                         'reviewcashback' : product.reviewcashback,
                         'refferial_code' : product.refferial_code,
                         'client_name' : product.client_name,

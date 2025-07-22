@@ -206,6 +206,7 @@ def create_or_update_business_detail(request):
         business_detail, created = Businessdetail.objects.update_or_create(
             business=user,  # Check by `business` field (OneToOne relation)
             defaults={
+                'description' : business_data.get('description'),
                 'category': business_data.get("category"),
                 'sub_category': business_data.get("subCategory"),
                 'abn_number': business_data.get("abnNumber"),
@@ -1054,6 +1055,7 @@ def send_email(email ,name ,phone ,client_id ,product_id,business_id):
     except:
         with open('C:\\bravo\email_key.json', 'r') as file:
             data = json.load(file)   
+            
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = data["key"]
     website_url = f"https://reviewpay.com.au/UserDashboard/BusinessPostReview?review_id={product_id}&business_id={business_id}"
@@ -1101,16 +1103,21 @@ def favorite_businesses(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def product_business_invoice(request):
+
     try:
         user = request.user
+        
         if user.role == 'business' :
             data = request.POST
             user_simple = CategoryUsers.objects.get(email= data.get('client_email'))
+            
             business = BusinessVerifications.objects.get(business= user)
             notification_business = CategoryUsers.objects.get(email=business.business) 
             if data.get('product_service') != '' and data.get('client_email') != '':
+               
                 product_service = data.get('product_service')
                 invoice_amount = data.get('invoice_amount')
+                invoice_number = data.get('invoice_number')
                 reviewcashback = data.get('reviewcashback')
                 refferial_code = data.get('refferial_code')
                 client_name = data.get('client_name')
@@ -1121,6 +1128,7 @@ def product_business_invoice(request):
                     business = business,
                     product_service = product_service,
                     invoice_amount = invoice_amount,
+                    invoice_number = invoice_number,
                     reviewcashback = reviewcashback,
                     refferial_code = refferial_code,
                     client_name = client_name,
