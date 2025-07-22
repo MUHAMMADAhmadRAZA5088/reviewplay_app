@@ -1328,13 +1328,25 @@ def sharereferral_code(request):
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
 def visionapi(request):
-    image_file = request.FILES.get('image')
-    if not image_file:
-        return Response({'error': 'No image uploaded'}, status=400)
-    # import pdb;pdb.set_trace()
-    client = vision.ImageAnnotatorClient.from_service_account_file(os.path.join('service_keys', 'vision-key.json'))
-    image = vision.Image(content=image_file.read())
-    response = client.label_detection(image=image)
-    labels = [label.description for label in response.label_annotations]
+    try:
+        image_file = request.FILES.get('image')
+        if not image_file:
+            return Response({'error': 'No image uploaded'}, status=400)
 
-    return Response({'labels': labels})
+        # Service key path
+        key_path = '/home/ubuntu/reviewplay_app/ReviewPay/service_keys/vision-key.json'
+        if not os.path.exists(key_path):  # if running on Windows
+            key_path = 'C:\\ReviewPlayRole\\ReviewPay\\service_keys\\vision-key.json'
+
+        # Pass the file path directly (not loaded json)
+        client = vision.ImageAnnotatorClient.from_service_account_file(key_path)
+
+        # Process the image
+        image = vision.Image(content=image_file.read())
+        response = client.label_detection(image=image)
+        labels = [label.description for label in response.label_annotations]
+
+        return Response({'labels': labels})
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
